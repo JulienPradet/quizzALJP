@@ -1,6 +1,6 @@
 import test from 'tape'
-import SimpleQuestion from '../../../../src/model/quizz/questions/SimpleQuestion'
-import { InvalidArgumentError } from '../../../../src/util/Error/BasicErrors'
+import SimpleQuestion from '../../../../../src/common/model/quizz/questions/SimpleQuestion'
+import { InvalidArgumentError } from '../../../../../src/common/util/Error/BasicErrors'
 import { is, Map } from 'immutable'
 
 test('instanciate a SimpleQuestion without the options and without key should throw an error', function(t) {

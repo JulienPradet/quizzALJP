@@ -1,59 +1,20 @@
-import Quizz from '../model/quizz/Quizz'
-import QuizzContainer from '../model/quizz/QuizzContainer'
-import questions from '../model/quizz/questions/questions'
+import express from 'express'
 
-const SimpleQuestion = questions.get('simpleQuestion')
+const app = express()
 
-const quizz = Quizz({
-    key: 'quizz'
-  })
-  .addStep(SimpleQuestion({
-    key: 'hi',
-    title: 'HI?',
-    answer: 'HI',
-  }));
+console.log(__dirname+'/../dist/public')
+app.set('view engine', 'ejs')
+app.use('/public', express.static(__dirname+'/../public'))
 
-const quizzContainer = QuizzContainer({ quizz })
+app.get('/favicon.ico', function(req, res) {})
 
-function displayAnswer(answer, answerResult) {
-  console.log(answer, 'is', (answerResult.isCorrect ? 'CORRECT!' : 'FALSE!'));
-  console.log('Recap: ', answerResult.quizzContainer.result());
+app.get('/', function(req, res) {
+  res.render('index')
+})
 
-  return answerResult.quizzContainer;
-}
+const server = app.listen(3000, function() {
+  var host = server.address().address
+  var port = server.address().port
 
-let result = displayAnswer(
-  'HI',
-  quizzContainer.answer(
-    'hi',
-    'julien',
-    'HI'
-  )
-)
-
-result = displayAnswer(
-  'HI',
-  result.answer(
-    'hi',
-    'quentin',
-    'HI'
-  )
-)
-
-result = displayAnswer(
-  'Nope',
-  result.answer(
-    'hi',
-    'etienne',
-    'Nope'
-  )
-)
-
-result = displayAnswer(
-  'Nope',
-  result.answer(
-    'hi',
-    'etienne',
-    'Nope'
-  )
-)
+  console.log('Example app listening at http://%s:%s', host, port)
+})
