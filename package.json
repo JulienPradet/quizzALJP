@@ -31,21 +31,18 @@
 
     "prebuild": "npm run clean",
     "build:js": "babel src -d dist && browserify dist/client/index.js > dist/public/client.js",
-    "build:css": "sass --update src/client/css:dist/public/stylesheets",
-    "build": "parallelshell 'npm run build:js' 'npm run build:css'",
+    "build": "parallelshell 'npm run build:js'",
 
-    "watch:babel": "parallelshell 'babel src -w -d dist' ''",
-    "watch:browserify": "watchify dist/client/index.js -o dist/public/client.js",
-    "watch:css": "sass --watch src/client/css:dist/public/stylesheets",
-    "watch": "parallelshell 'npm run watch:babel' 'npm run watch:browserify' 'npm run watch:css'",
+    "watch:browserify": "watchify src/client/index.js -t babelify -o dist/public/client.js",
+    "watch": "parallelshell 'npm run watch:browserify'",
     "livereload": "livereload dist/public",
     "dev": "parallelshell 'npm run livereload' 'npm run watch'",
 
     "test": "babel-tape-runner test/**/*.js | tap-spec",
 
+    "serve": "node dist/server/index.js",
     "prestart": "npm run build && npm run test",
-    "quickstart": "node dist/server/index.js",
-    "start": "npm run quickstart"
+    "start": "npm run serve"
   },
   "author": "Julien Pradet <julien@pradet.me> (http://julien.pradet.me/)",
   "license": "MIT"
