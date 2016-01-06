@@ -38,14 +38,17 @@ export default function MasterPeer() {
       return peer.isConnected()
     },
 
-    connect() {
-      peer.connect()
+    connect(loginSuccess, loginFailure) {
+      peer.connect(
+        loginSuccess,
+        loginFailure
+      )
       return this
     },
 
-    disconnect() {
+    disconnect(callback) {
       peer.hangupAll()
-      peer.disconnect()
+      peer.disconnect(callback)
       return this
     }
   }

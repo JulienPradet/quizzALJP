@@ -1,10 +1,11 @@
 import { Map } from 'immutable'
-import easyrtc from 'easyrtc'
+import Rx from 'rx'
+// import easyrtc from 'easyrtc'
 
 /**
  * Simple abstraction over easyrtc in order to only have a simple data channel api
  */
-export function Peer() {
+export default function Peer() {
   let _easyRtcId = null
   const custom = {}
   const message$ = new Rx.Subject()
@@ -31,6 +32,8 @@ export function Peer() {
 
   function disconnectListener() {
     _easyRtcId = null
+    if(typeof custom.disconnectListener === "function")
+      custom.disconnectListener.apply(this, arguments)
   }
 
   /**
@@ -84,7 +87,7 @@ export function Peer() {
      * @return boolean
      */
     isConnected() {
-      return easyrtc.getConnectStatus()
+      return easyrtc.getConnectStatus() === easyrtc.IS_CONNECTED
     },
 
     /**
@@ -106,8 +109,15 @@ export function Peer() {
     /**
      * Connect to the easyrtc server
      */
-    connect() {
+    connect(loginSuccess, loginFailure) {
       if(!this.isConnected()) {
+        if(typeof loginSuccess === "function") {
+          this.set('loginSuccess', loginSuccess)
+        }
+        if(typeof loginFailure === "function") {
+          this.set('loginFailure', loginFailure)
+        }
+
         easyrtc.enableDebug(true)
         easyrtc.enableDataChannels(true)
         easyrtc.enableVideo(false)
@@ -121,7 +131,9 @@ export function Peer() {
         easyrtc.setAcceptChecker(acceptChecker)
 
         easyrtc.setDisconnectListener(disconnectListener)
-        easyrtc.connect("aljp.quizz", loginSuccess, loginFailure)
+        easyrtc.connect("dataMessaging", loginSuccess, loginFailure)
+      } else {
+        console.warn('The peer is already connected')
       }
 
       return this
@@ -130,8 +142,11 @@ export function Peer() {
     /**
      * Disconnect from the easyrtc server
      */
-    disconnect() {
+    disconnect(callback) {
       if(this.isConnected()) {
+        if(typeof callback === "function") {
+          this.set('disconnectListener', callback)
+        }
         easyrtc.disconnect()
       }
 

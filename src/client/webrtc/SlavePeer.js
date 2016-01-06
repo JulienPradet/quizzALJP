@@ -11,9 +11,10 @@ export default function SlavePeer() {
     })
     .set('callSuccess', function(masterPeerId) {
       _masterPeerId = masterPeerId
+      console.info('callSuccess')
     })
     .set('callError', function() {
-
+      console.info('callFailure')
     })
     .set('acceptChecker', function(peerId, acceptor) {
       acceptor(false);
@@ -32,14 +33,19 @@ export default function SlavePeer() {
       return master !== null
     },
 
-    connect(masterPeerId) {
-      _masterPeerId = masterPeerId
-      peer.connect()
-      return this
+    connect(masterPeerId, loginSuccess, loginFailure) {
+      if(!!masterPeerId) {
+        _masterPeerId = masterPeerId
+        peer.connect()
+        return this
+      } else {
+        console.warn('No peer id given')
+      }
     },
 
-    disconnect() {
-      peer.disconnect()
+    disconnect(callback) {
+      peer.hangup(_masterPeerId)
+      peer.disconnect(callback)
       return this
     }
   }

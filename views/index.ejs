@@ -2,9 +2,26 @@
 <html>
 <head>
   <title>Hello world!</title>
-  <link rel="stylesheet" href="./public/style.css">
+  <link rel="stylesheet" href="./public/stylesheets/main.css">
 </head>
 <body>
   Hi there !
+
+  <div>
+    <button id="launch-master">Launch master</button>
+  </div>
+
+  <div>
+    <input type="text" id="master-peer-id" />
+    <button id="launch-slave">Launch slave</button>
+  </div>
+
+  <script>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+    ':35729/livereload.js?snipver=1"></' + 'script>')
+  </script>
+
+  <script src="https://demo.easyrtc.com/socket.io/socket.io.js"></script>
+  <script src="https://demo.easyrtc.com/easyrtc/easyrtc.js"></script>
   <script src="./public/client.js"></script>
 </body>
