@@ -1,71 +1,83 @@
 import { Map } from 'immutable'
 import Rx from 'rx'
-// import easyrtc from 'easyrtc'
+
+const key = 'azw18bz9zlz93sor';
 
 /**
  * Simple abstraction over easyrtc in order to only have a simple data channel api
  */
-export default function Peer() {
-  let _easyRtcId = null
+export default function CustomPeer() {
+  let peer
   const custom = {}
   const message$ = new Rx.Subject()
+
+  const eventsToFunc = {
+    'peer.open': 'openListener',
+    'peer.connection': 'peerConnectedListener',
+    'peer.call': 'incomingCallListener',
+    'peer.close': 'peerDisconnectedListener',
+    'peer.disconnected': 'closeListener',
+    'peer.error': 'errorListener',
+    'conn.open': 'peerConnectedListener',
+    'conn.close': 'peerDisconnectedListener',
+    'conn.error': 'peerErrorListener'
+  }
 
   /**
    * When the login to the signaling server worked
    * @see https://www.easyrtc.com/docs/browser/easyrtc.php#connect successCallback
    */
-  function loginSuccess(easyRtcId) {
-    _easyRtcId = easyRtcId
-    if(typeof custom.loginSuccess === "function")
-      custom.loginSuccess.apply(this, arguments)
+  function openListener(id) {
+    console.log("test")
+    if(typeof custom.openListener === "function")
+      custom.openListener.apply(this, arguments)
   }
 
-  /**
-   * When the login to the signaling server failed
-   * @see https://www.easyrtc.com/docs/browser/easyrtc.php#connect errorCallback
-   */
-  function loginFailure() {
-    _easyRtcId = null
-    if(typeof custom.loginFailure === "function")
-      custom.loginFailure.apply(this, arguments)
+  function closeListener() {
+    if(typeof custom.closeListener === "function")
+      custom.closeListener.apply(this, arguments)
   }
 
-  function disconnectListener() {
-    _easyRtcId = null
-    if(typeof custom.disconnectListener === "function")
-      custom.disconnectListener.apply(this, arguments)
+  function errorListener() {
+    if(typeof custom.errorListener === "function")
+      custom.errorListener.apply(this, arguments)
   }
 
   /**
    * When a new connection has been established
    * @see https://www.easyrtc.com/docs/browser/easyrtc.php#setDataChannelOpenListener listener
    */
-  function openListener() {
-    if(typeof custom.openListener === "function")
-      custom.openListener.apply(this, arguments)
+  function peerConnectedListener() {
+    if(typeof custom.peerConnectedListener === "function")
+      custom.peerConnectedListener.apply(this, arguments)
   }
 
   /**
    * When a connection was closed
    * @see https://www.easyrtc.com/docs/browser/easyrtc.php#setDataChannelCloseListener listener
    */
-  function closeListener() {
-    if(typeof custom.closeListener === "function")
-      custom.closeListener.apply(this, arguments)
+  function peerDisconnectedListener() {
+    if(typeof custom.peerDisconnectedListener === "function")
+      custom.peerDisconnectedListener.apply(this, arguments)
+  }
+
+  function peerErrorListener() {
+    if(typeof custom.peerErrorListener === "function")
+      custom.peerErrorListener.apply(this, arguments)
   }
 
   /**
    * When a connection was closed
    * @see https://www.easyrtc.com/docs/browser/easyrtc.php#setPeerListener listener
    */
-  function messageListener() {
+  function messageListener(peerId, data) {
     console.info("Message received from peer", arguments)
-    message$.onNext(peerId, msgType, msgData)
+    message$.onNext({ peerId, data })
   }
 
-  function acceptChecker() {
-    if(typeof custom.acceptChecker === "function") {
-      custom.acceptChecker.apply(this, arguments)
+  function incomingCallListener() {
+    if(typeof custom.incomingCallListener === "function") {
+      custom.incomingCallListener.apply(this, arguments)
     }
   }
 
@@ -75,7 +87,7 @@ export default function Peer() {
      * @return string unique id of the EasyRTC connection
      */
     id() {
-      return _easyRtcId
+      return peer.id
     },
 
     message$() {
@@ -83,58 +95,43 @@ export default function Peer() {
     },
 
     /**
-     * Tests if the peer is connected to EasyRTC
+     * Tests if the peer is connected to the signaling server
      * @return boolean
      */
     isConnected() {
-      return easyrtc.getConnectStatus() === easyrtc.IS_CONNECTED
+      return !peer.disconnected
     },
 
     /**
      * Setter for the custom callbacks
      * @return Peer allows to chain functions
      */
-    set(callbackName, func) {
-      if(typeof func === "undefined") {
-        custom[callbackName] = func
+    on(eventName, func) {
+      if(typeof func === "function") {
+        custom[eventsToFunc[eventName]] = func
       }
+
       return this
     },
 
-    send(peerId, msgType, msgData) {
-      easyrtc.sendDataP2P(peerId, msgType, msgData)
+    send(peerId, data) {
+      activeConnections[peerId].send(data)
+
       return this
     },
 
     /**
      * Connect to the easyrtc server
      */
-    connect(loginSuccess, loginFailure) {
-      if(!this.isConnected()) {
-        if(typeof loginSuccess === "function") {
-          this.set('loginSuccess', loginSuccess)
-        }
-        if(typeof loginFailure === "function") {
-          this.set('loginFailure', loginFailure)
-        }
-
-        easyrtc.enableDebug(true)
-        easyrtc.enableDataChannels(true)
-        easyrtc.enableVideo(false)
-        easyrtc.enableAudio(false)
-        easyrtc.enableVideoReceive(false)
-        easyrtc.enableAudioReceive(false)
-
-        easyrtc.setDataChannelOpenListener(openListener)
-        easyrtc.setDataChannelCloseListener(closeListener)
-        easyrtc.setPeerListener(messageListener)
-        easyrtc.setAcceptChecker(acceptChecker)
-
-        easyrtc.setDisconnectListener(disconnectListener)
-        easyrtc.connect("dataMessaging", loginSuccess, loginFailure)
-      } else {
-        console.warn('The peer is already connected')
-      }
+    connect() {
+      peer = new Peer({key})
+      peer
+        .on('open', openListener)
+        .on('connection', peerConnectedListener)
+        .on('call', incomingCallListener)
+        .on('close', peerDisconnectedListener)
+        .on('disconnected', closeListener)
+        .on('error', errorListener)
 
       return this
     },
@@ -142,52 +139,35 @@ export default function Peer() {
     /**
      * Disconnect from the easyrtc server
      */
-    disconnect(callback) {
-      if(this.isConnected()) {
-        if(typeof callback === "function") {
-          this.set('disconnectListener', callback)
-        }
-        easyrtc.disconnect()
-      }
+    disconnect() {
+      peer.disconnect()
 
       return this
     },
 
     call(peerId) {
-      if (easyrtc.getConnectStatus(peerId) === easyrtc.NOT_CONNECTED) {
-        try {
-          easyrtc.call(peerId,
-            function successCall(caller, media) { // success callback
-              if (media === 'datachannel') {
-                console.info('Connected to '+peerId)
-                if(typeof custom.callSuccessful === "function") {
-                  custom.callSuccess(caller)
-                }
-              }
-            },
-            function errorCall(errorCode, errorMessage) {
-              console.error('Impossible to connect to '+peerId, errorCode, errorMessage)
-              if(typeof custom.callSuccessful === "function") {
-                custom.callError(peerId, errorCode, errorMessage)
-              }
-            }
-          );
-        } catch(callerror) {
-          console.error('Impossible to connect to '+peerId)
-          console.error(callerror)
-        }
-      } else {
-        console.warn('Already connected to '+peerId)
-      }
+      const conn = peer
+        .on('open', peerConnectedListener)
+        .on('close', peerDisconnectedListener)
+        .on('data', function(data) {
+          messageListener(conn.peer, data)
+        })
+        .on('error', peerErrorListener)
+        .connect(peerId)
+
+      return this
     },
 
     hangup(peerId) {
-      easyrtc.hangup(peerId)
+      const conn = peer.connections[peerId]
+      if(conn) conn.close
+
       return this
     },
 
     hangupAll() {
-      easyrtc.hangupAll()
+      Object.keys(peer.connections).forEach(peerId => this.hangup(peerId))
+
       return this
     }
   }

@@ -3,20 +3,25 @@ import Peer from './Peer'
 
 
 export default function MasterPeer() {
-  const slaves = List().asMutable()
-
   const peer = Peer()
-    .set('openListener', function(easyRtcId) {
-      slaves.push(easyRtcId)
+    .on('peer.open', function() {
+      console.info('Master: Connected'+peer.id())
     })
-    .set('closeListener', function(easyRtcId) {
-      const index = slaves.find(x => c === easyRtcId)
-      if(index > -1) {
-        slaves.delete(index)
-      }
+    .on('peer.disconnected', function() {
+      console.info('Master: Disconnected')
     })
-    .set('acceptChecker', function(peerId, acceptor) {
-      acceptor(true);
+    .on('peer.connection', function(conn) {
+      console.info('Master: New peer connected: '+conn.peer)
+    })
+    .on('peer.call', function(conn) {
+      conn.answer();
+      console.info('Master: Answered to: '+conn.peer)
+    })
+    .on('peer.close', function() {
+      console.info('Master: Closing')
+    })
+    .on('peer.error', function(err) {
+      console.error('Master: Error', err)
     })
 
   return {
@@ -24,25 +29,23 @@ export default function MasterPeer() {
       return peer.message$()
     },
 
-    broadcast(msgType, msgData) {
+    broadcast(data) {
       slaves.forEach(x => {
-        peer.send(x, msgType, msgData)
+        peer.send(x, data)
       })
     },
 
-    send(peerId, msgType, msgData) {
-      peer.send(peerId, msgType, msgData)
+    send(peerId, data) {
+      peer.send(peerId, data)
     },
 
     isConnected() {
       return peer.isConnected()
     },
 
-    connect(loginSuccess, loginFailure) {
-      peer.connect(
-        loginSuccess,
-        loginFailure
-      )
+    connect() {
+      peer.connect()
+
       return this
     },
 

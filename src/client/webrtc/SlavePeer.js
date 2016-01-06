@@ -6,18 +6,25 @@ export default function SlavePeer() {
   let _masterPeerId = null
 
   const peer = Peer()
-    .set('loginSuccess', function() {
+    .on('peer.open', function() {
+      console.info('Slave: Connected. Attempting to connect to master.')
       peer.call(_masterPeerId)
     })
-    .set('callSuccess', function(masterPeerId) {
-      _masterPeerId = masterPeerId
-      console.info('callSuccess')
+    .on('peer.disconnected', function() {
+      console.info('Slave: Disconnected')
     })
-    .set('callError', function() {
-      console.info('callFailure')
+    .on('peer.connection', function(conn) {
+      console.info('Slave: New peer connected: '+conn.peer)
     })
-    .set('acceptChecker', function(peerId, acceptor) {
-      acceptor(false);
+    .on('peer.call', function(conn) {
+      console.info('Slave: Refuse connection: '+conn.peer)
+      conn.close();
+    })
+    .on('peer.close', function() {
+      console.info('Slave: Closing')
+    })
+    .on('peer.error', function(err) {
+      console.error('Slave: Error', err)
     })
 
   return {

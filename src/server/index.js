@@ -1,4 +1,7 @@
 import express from 'express'
+import http from 'http'
+import io from 'socket.io'
+import easyrtc from 'easyrtc'
 
 const app = express()
 
@@ -12,9 +15,9 @@ app.get('/', function(req, res) {
   res.render('index')
 })
 
-const server = app.listen(3000, function() {
-  var host = server.address().address
-  var port = server.address().port
+const webServer = app.listen(3000, function() {
+  var host = webServer.address().address
+  var port = webServer.address().port
 
   console.log('Example app listening at http://%s:%s', host, port)
 })
