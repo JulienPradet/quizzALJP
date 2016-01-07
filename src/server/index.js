@@ -1,11 +1,8 @@
 import express from 'express'
 import http from 'http'
-import io from 'socket.io'
-import easyrtc from 'easyrtc'
 
 const app = express()
 
-console.log(__dirname+'/../public')
 app.set('view engine', 'ejs')
 app.use('/public', express.static(__dirname+'/../public'))
 

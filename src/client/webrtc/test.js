@@ -17,35 +17,33 @@ export default function launchTest() {
       disconnectFromCurrent(function connectToSlave() {
         const masterPeerId = document.getElementById('master-peer-id').value
 
-        console.log("Launch Slave")
-
-        currentPeer = SlavePeer()
-        currentPeer.connect(
-          masterPeerId,
-          function loginSlaveSuccess(peerId) {
-            console.info('Slave id: '+peerId)
-          },
-          function loginSlaveFailure() {
-            console.error('Failed to connect')
-          }
-        )
+        console.info("Launch Slave")
+        currentPeer = SlavePeer(masterPeerId)
+        listenToCurrentPeer()
       })
     }
 
   document.getElementById('launch-master')
     .onclick = function launchMaster() {
       disconnectFromCurrent(function connectToMaster() {
-        console.log("Launch Master")
-
+        console.info("Launch Master")
         currentPeer = MasterPeer()
-        currentPeer.connect(
-          function loginMasterSuccess(peerId) {
-            console.inf('Master id: '+peerId)
-          },
-          function loginMasterFailure() {
-            console.error('Failed to connect')
-          }
-        )
+        listenToCurrentPeer()
       })
     }
+
+  function listenToCurrentPeer() {
+    currentPeer.message$()
+      .subscribe(
+        function(data) {
+          console.log(data)
+        },
+        function() {
+          console.error(arguments)
+        },
+        function() {
+          console.info(arguments)
+        }
+      )
+  }
 }

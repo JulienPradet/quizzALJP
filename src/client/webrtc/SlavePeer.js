@@ -1,59 +1,57 @@
-import { Map } from 'immutable'
-import Peer from './Peer'
+import Rx from 'rx'
+import { key } from './Peer'
 
 
-export default function SlavePeer() {
-  let _masterPeerId = null
+export default function SlavePeer(masterPeerId) {
+  const message$ = new Rx.Subject()
+  let conn
 
-  const peer = Peer()
-    .on('peer.open', function() {
+  const peer = Peer({ key })
+    .on('open', function() {
       console.info('Slave: Connected. Attempting to connect to master.')
-      peer.call(_masterPeerId)
+
+      conn = peer.connect(masterPeerId)
+        .on('data', function(data) {
+          console.info('Master: Message received from '+conn.peer)
+          message$.onNext({ peerId: conn.peer, data: data })
+        })
+        .on('open', function() {
+          console.info('Slave: Connected to master')
+          conn.send({
+            type: 'hello',
+            message: 'hi master'
+          })
+        })
+        .on('close', function() {
+          console.log('Slave: Lost connection to master')
+        })
+        .on('error', function() {
+          console.err('Slave: Error', arguments)
+        })
     })
-    .on('peer.disconnected', function() {
+    .on('disconnected', function() {
       console.info('Slave: Disconnected')
     })
-    .on('peer.connection', function(conn) {
-      console.info('Slave: New peer connected: '+conn.peer)
+    .on('connection', function(conn) {
+      console.info('Slave: New peer attempted to connect: '+conn.peer)
+      console.warn('Rejecting peer')
+      conn.close()
     })
-    .on('peer.call', function(conn) {
-      console.info('Slave: Refuse connection: '+conn.peer)
-      conn.close();
-    })
-    .on('peer.close', function() {
+    .on('close', function() {
       console.info('Slave: Closing')
     })
-    .on('peer.error', function(err) {
+    .on('error', function(err) {
       console.error('Slave: Error', err)
     })
 
+  function send(data) {
+    conn.send(masterPeerId, data)
+  }
+
   return {
     message$() {
-      return peer.message$()
+      return message$
     },
-
-    send(msgType, msgData) {
-      peer.master(_masterPeerId, msgType, msgData)
-    },
-
-    isConnected() {
-      return master !== null
-    },
-
-    connect(masterPeerId, loginSuccess, loginFailure) {
-      if(!!masterPeerId) {
-        _masterPeerId = masterPeerId
-        peer.connect()
-        return this
-      } else {
-        console.warn('No peer id given')
-      }
-    },
-
-    disconnect(callback) {
-      peer.hangup(_masterPeerId)
-      peer.disconnect(callback)
-      return this
-    }
+    send
   }
 }

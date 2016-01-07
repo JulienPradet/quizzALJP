@@ -1,58 +1,67 @@
-import { List } from 'immutable'
-import Peer from './Peer'
-
+import Rx from 'rx'
+import { key } from './Peer'
 
 export default function MasterPeer() {
-  const peer = Peer()
-    .on('peer.open', function() {
-      console.info('Master: Connected'+peer.id())
+  const message$ = new Rx.Subject()
+
+  const peer = new Peer({ key })
+    .on('open', function(id) {
+      console.info('Master: Connected '+id)
     })
-    .on('peer.disconnected', function() {
+    .on('disconnected', function() {
       console.info('Master: Disconnected')
     })
-    .on('peer.connection', function(conn) {
-      console.info('Master: New peer connected: '+conn.peer)
+    .on('connection', function(conn) {
+      console.info('Master: Slave connecting '+conn.peer)
+      conn
+        .on('open', function() {
+          console.info('Master: Slave connected '+conn.peer)
+          conn.send({
+            type: 'hello',
+            message: 'hi slave'
+          })
+        })
+        .on('data', function(data) {
+          console.info('Master: Message received from '+conn.peer)
+          message$.onNext({ peerId: conn.peer, data: data })
+        })
+        .on('close', function() {
+          console.log('Master: Slave disconnected '+conn.peer)
+        })
+        .on('error', function() {
+          console.err('Master : Error', arguments)
+        })
     })
-    .on('peer.call', function(conn) {
-      conn.answer();
-      console.info('Master: Answered to: '+conn.peer)
-    })
-    .on('peer.close', function() {
+    .on('close', function() {
       console.info('Master: Closing')
     })
-    .on('peer.error', function(err) {
+    .on('error', function(err) {
       console.error('Master: Error', err)
     })
 
+  function broadcast(data) {
+    for(var peerId in peer.connections) {
+      peer.connections.forEach(function(conn) {
+        conn.send(data)
+      })
+    }
+
+    return this
+  }
+
+  function send(peerId, data) {
+    peer.connections[peerId].forEach(function(conn) {
+      conn.send(data)
+    })
+
+    return this
+  }
+
   return {
     message$() {
-      return peer.message$()
+      return message$
     },
-
-    broadcast(data) {
-      slaves.forEach(x => {
-        peer.send(x, data)
-      })
-    },
-
-    send(peerId, data) {
-      peer.send(peerId, data)
-    },
-
-    isConnected() {
-      return peer.isConnected()
-    },
-
-    connect() {
-      peer.connect()
-
-      return this
-    },
-
-    disconnect(callback) {
-      peer.hangupAll()
-      peer.disconnect(callback)
-      return this
-    }
+    broadcast,
+    send
   }
 }
