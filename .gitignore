@@ -1,5 +1,6 @@
 .idea
 dist
+testdist
 node_modules
 .remote-sync.json
 .sass-cache

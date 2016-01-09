@@ -1,35 +1,45 @@
 import Rx from 'rx'
 import { key } from './Peer'
+import Peer from 'peerjs'
 
 export default function MasterPeer() {
   const message$ = new Rx.Subject()
+  const eventCallbacks = {}
 
   const peer = new Peer({ key })
     .on('open', function(id) {
       console.info('Master: Connected '+id)
+      if(typeof eventCallbacks['connected'] === 'function') {
+        eventCallbacks['connected'].apply(this, arguments)
+      }
     })
     .on('disconnected', function() {
       console.info('Master: Disconnected')
+      if(typeof eventCallbacks['disconnected'] === 'function') {
+        eventCallbacks['disconnected'].apply(this, arguments)
+      }
     })
     .on('connection', function(conn) {
       console.info('Master: Slave connecting '+conn.peer)
       conn
         .on('open', function() {
           console.info('Master: Slave connected '+conn.peer)
-          conn.send({
-            type: 'hello',
-            message: 'hi slave'
-          })
+          if(typeof eventCallbacks['slaveConnected'] === 'function') {
+            eventCallbacks['slaveConnected'].apply(this, arguments)
+          }
         })
         .on('data', function(data) {
           console.info('Master: Message received from '+conn.peer)
           message$.onNext({ peerId: conn.peer, data: data })
         })
         .on('close', function() {
-          console.log('Master: Slave disconnected '+conn.peer)
+          console.info('Master: Slave disconnected '+conn.peer)
+          if(typeof eventCallbacks['slaveDisconnected'] === 'function') {
+            eventCallbacks['slaveDisconnected'].apply(this, arguments)
+          }
         })
         .on('error', function() {
-          console.err('Master : Error', arguments)
+          console.error('Master : Error', arguments)
         })
     })
     .on('close', function() {
@@ -41,7 +51,7 @@ export default function MasterPeer() {
 
   function broadcast(data) {
     for(var peerId in peer.connections) {
-      peer.connections.forEach(function(conn) {
+      peer.connections[peerId].forEach(function(conn) {
         conn.send(data)
       })
     }
@@ -58,8 +68,20 @@ export default function MasterPeer() {
   }
 
   return {
+    id() {
+      return peer.id
+    },
     message$() {
       return message$
+    },
+    on(event, callback) {
+      if(['connected', 'disconnected', 'slaveConnected', 'slaveDisconnected'].indexOf(event) >= 0) {
+        eventCallbacks[event] = callback
+      } else {
+        console.warn('Wrong event name')
+      }
+
+      return this
     },
     broadcast,
     send
