@@ -4,38 +4,55 @@
   "description": "",
   "main": "build/server/index.js",
   "dependencies": {
-    "immutable": "~3.7.6"
+    "easyrtc": "^1.0.15",
+    "ejs": "^2.3.4",
+    "express": "^4.13.3",
+    "immutable": "~3.7.6",
+    "peerjs": "^0.3.14",
+    "rx": "^4.0.7"
   },
   "devDependencies": {
     "babel": "~6.3.26",
+    "babel-cli": "^6.3.17",
     "babel-preset-es2015": "~6.3.13",
-    "tape": "~4.4.0",
-    "babel-tape-runner": "~2.0.0",
     "babel-preset-react": "~6.3.13",
-    "rimraf": "~2.5.0",
-    "nodemon": "~1.8.1",
+    "babel-tape-runner": "~2.0.0",
+    "babelify": "^7.2.0",
+    "browserify": "^12.0.1",
+    "livereload": "^0.4.0",
     "parallelshell": "~2.0.0",
-    "live-reload": "~1.1.0",
+    "rimraf": "~2.5.0",
+    "tap-spec": "~4.1.1",
+    "tape": "~4.4.0",
     "uglifyjs": "~2.4.10",
-    "tap-spec": "~4.1.1"
+    "watchify": "^3.6.1"
   },
   "scripts": {
-    "clean": "rimraf dist/*",
+    "clean": "rimraf dist && mkdir -p dist && mkdir -p dist/public",
 
-    "prebuild": "npm run clean -s",
-    "build:js": "babel src -d dist && browserify dist/client/index.js | uglifyjs > dist/client.js",
-    "build": "parallelshell 'npm run build:js -s'",
+    "prebuild": "npm run clean",
+    "build:js": "babel src -d dist && browserify dist/client/index.js > dist/public/client.js",
+    "build": "parallelshell 'npm run build:js'",
 
-    "watch:js": "parallelshell 'babel src -w -d dist' ''",
-    "watch": "parallelshell 'npm run watch:js -s'",
+    "watch:browserify": "watchify src/client/index.js -t babelify -o dist/public/client.js",
+    "watch": "parallelshell 'npm run watch:browserify'",
+    "livereload": "livereload dist/public",
+    "dev": "parallelshell 'npm run livereload' 'npm run watch'",
 
-    "test": "babel-tape-runner test/**/*.js | tap-spec",
+    "test:common": "babel-tape-runner test/common/**/*.test.js | tap-spec",
+    "test:client": "mkdir -p testdist/public && babel test/client -d testdist && browserify -t babelify test/client/**/*.js > testdist/public/client.js && node testdist/index.js",
+    "test": "npm run test:common && npm run test:client",
 
-    "live-reload": "live-reload --port 9091 dist/",
-    "dev": "parallelshell 'npm run live-reload -s' 'npm run watch -s'",
-
-    "start": "node build/server/index.js"
+    "serve": "node dist/server/index.js",
+    "prestart": "npm run build",
+    "start": "npm run serve"
   },
   "author": "Julien Pradet <julien@pradet.me> (http://julien.pradet.me/)",
-  "license": "MIT"
+  "license": "MIT",
+  "testling": {
+    "files": "test/client/**/*.js",
+    "browsers": [
+      "chrome/latest"
+    ]
+  }
 }

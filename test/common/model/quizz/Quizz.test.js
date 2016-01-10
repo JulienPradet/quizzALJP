@@ -1,7 +1,7 @@
 import test from 'tape'
-import Quizz from '../../../src/model/quizz/Quizz'
-import questions from '../../../src/model/quizz/questions/questions'
-import { InvalidArgumentError } from '../../../src/util/Error/BasicErrors'
+import Quizz from '../../../../src/common/model/quizz/Quizz'
+import questions from '../../../../src/common/model/quizz/questions/questions'
+import { InvalidArgumentError } from '../../../../src/common/util/Error/BasicErrors'
 import { is, List } from 'immutable'
 
 test('instanciate a Quizz without the options and without key should throw an error', function(t) {
