@@ -10,13 +10,13 @@ export default function MasterPeer() {
     .on('open', function(id) {
       console.info('Master: Connected '+id)
       if(typeof eventCallbacks['connected'] === 'function') {
-        eventCallbacks['connected'].apply(this, arguments)
+        eventCallbacks['connected'].call(this, id)
       }
     })
     .on('disconnected', function() {
       console.info('Master: Disconnected')
       if(typeof eventCallbacks['disconnected'] === 'function') {
-        eventCallbacks['disconnected'].apply(this, arguments)
+        eventCallbacks['disconnected'].call(this)
       }
     })
     .on('connection', function(conn) {
@@ -25,17 +25,17 @@ export default function MasterPeer() {
         .on('open', function() {
           console.info('Master: Slave connected '+conn.peer)
           if(typeof eventCallbacks['slaveConnected'] === 'function') {
-            eventCallbacks['slaveConnected'].apply(this, arguments)
+            eventCallbacks['slaveConnected'].call(this, conn.peer)
           }
         })
         .on('data', function(data) {
           console.info('Master: Message received from '+conn.peer)
-          message$.onNext({ peerId: conn.peer, data: data })
+          message$.onNext({ peerId: conn.peer, message: data })
         })
         .on('close', function() {
           console.info('Master: Slave disconnected '+conn.peer)
           if(typeof eventCallbacks['slaveDisconnected'] === 'function') {
-            eventCallbacks['slaveDisconnected'].apply(this, arguments)
+            eventCallbacks['slaveDisconnected'].call(this, conn.peer)
           }
         })
         .on('error', function() {

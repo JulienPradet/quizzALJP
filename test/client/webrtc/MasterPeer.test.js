@@ -10,9 +10,8 @@ test('Master should be able to send messages to incoming connections', function(
     slave = SlavePeer(masterId)
     slave.message$()
       .subscribe(
-        function({ peerId, data }) {
-          t.equal(peerId, master.id())
-          t.equal(message, data)
+        function({ message }) {
+          t.equal(message, message)
           t.end()
         }
       )

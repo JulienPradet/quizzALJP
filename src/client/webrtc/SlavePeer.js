@@ -14,7 +14,7 @@ export default function SlavePeer(masterPeerId) {
       conn = peer.connect(masterPeerId)
         .on('data', function(data) {
           console.info('Slave: Message received from '+conn.peer)
-          message$.onNext({ peerId: conn.peer, data: data })
+          message$.onNext({ message: data })
         })
         .on('open', function() {
           console.info('Slave: Connected to master')
@@ -25,8 +25,9 @@ export default function SlavePeer(masterPeerId) {
         .on('error', function() {
           console.error('Slave: Error', arguments)
         })
-      if(typeof eventCallbacks['open'] === 'function') {
-        eventCallbacks['open'].apply(this, arguments)
+
+      if(typeof eventCallbacks['connected'] === 'function') {
+        eventCallbacks['connected'].apply(this, arguments)
       }
     })
     .on('disconnected', function() {
@@ -39,21 +40,12 @@ export default function SlavePeer(masterPeerId) {
       console.info('Slave: New peer attempted to connect: '+conn.peer)
       console.warn('Rejecting peer')
       conn.close()
-      if(typeof eventCallbacks['connection'] === 'function') {
-        eventCallbacks['connection'].apply(this, arguments)
-      }
     })
     .on('close', function() {
       console.info('Slave: Closing')
-      if(typeof eventCallbacks['close'] === 'function') {
-        eventCallbacks['close'].apply(this, arguments)
-      }
     })
     .on('error', function(err) {
       console.error('Slave: Error', err)
-      if(typeof eventCallbacks['error'] === 'function') {
-        eventCallbacks['error'].apply(this, arguments)
-      }
     })
 
   function send(data) {
@@ -68,7 +60,7 @@ export default function SlavePeer(masterPeerId) {
       return message$
     },
     on(event, callback) {
-      if(['open', 'disconnected', 'connection', 'close', 'error'].indexOf(event) >= 0) {
+      if(['connected', 'disconnected'].indexOf(event) >= 0) {
         eventCallbacks[event] = callback
       } else {
         console.warn('Wrong event name')
