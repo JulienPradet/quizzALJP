@@ -84,6 +84,9 @@ export default function MasterPeer() {
       return this
     },
     broadcast,
-    send
+    send,
+    close() {
+      peer.destroy()
+    }
   }
 }

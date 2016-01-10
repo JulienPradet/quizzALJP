@@ -18,23 +18,23 @@ export default function SlavePeer(masterPeerId) {
         })
         .on('open', function() {
           console.info('Slave: Connected to master')
+          if(typeof eventCallbacks['connected'] === 'function') {
+            eventCallbacks['connected'].apply(this, arguments)
+          }
         })
         .on('close', function() {
-          console.log('Slave: Lost connection to master')
+          console.info('Slave: Lost connection to master')
+          if(typeof eventCallbacks['disconnected'] === 'function') {
+            eventCallbacks['disconnected'].apply(this, arguments)
+          }
         })
         .on('error', function() {
           console.error('Slave: Error', arguments)
         })
 
-      if(typeof eventCallbacks['connected'] === 'function') {
-        eventCallbacks['connected'].apply(this, arguments)
-      }
     })
     .on('disconnected', function() {
       console.info('Slave: Disconnected')
-      if(typeof eventCallbacks['disconnected'] === 'function') {
-        eventCallbacks['disconnected'].apply(this, arguments)
-      }
     })
     .on('connection', function(conn) {
       console.info('Slave: New peer attempted to connect: '+conn.peer)
@@ -49,7 +49,7 @@ export default function SlavePeer(masterPeerId) {
     })
 
   function send(data) {
-    conn.send(masterPeerId, data)
+    conn.send(data)
   }
 
   return {
@@ -68,6 +68,9 @@ export default function SlavePeer(masterPeerId) {
 
       return this
     },
-    send
+    send,
+    close() {
+      peer.destroy()
+    }
   }
 }

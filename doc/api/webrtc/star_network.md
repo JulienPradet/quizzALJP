@@ -23,6 +23,7 @@ Lives in `/src/client/webrtc/MasterPeer`.
 - `MasterPeer:message$()` : gets the stream of messages received by the Master. It is an Rx.Observable and the object that can be received in the stream is `{ peerId, message }`
 - `MasterPeer:send(peerId, message)` : sends a message to a specific peer that is connected to the Master
 - `MasterPeer:broadcast(message)`: sends a message to all the peers connected to the Master
+- `MasterPeer:close()`: destroys the peer (super relevant for tests in order not to have to many active connections)
 - `MasterPeer:on(event, callback)`: callback called for specific events. The registered events are :
     - `connected` : The master successfully connected to the signalling server
 
@@ -62,11 +63,12 @@ Lives in `/src/client/webrtc/SlavePeer`.
 - `SlavePeer:id()` : gets the id of the peer
 - `SlavePeer:message$()` : gets the stream of messages received by the Slave. It is an Rx.Observable and the object that can be received in the stream is `{ message }`
 - `SlavePeer:send(message)` : sends a message to the Master
+- `SlavePeer:close()`: destroys the peer (super relevant for tests in order not to have to many active connections)
 - `SlavePeer:on(event, callback)`: callback called for specific events. The registered events are :
-    - `connected` : The master successfully connected to the signalling server
+    - `connected` : The slave successfully connected to the master
 
         Callback: `function(id)`
         - `id` is the master's id
 
-    - `disconnected` : The slave was disconnected from the signalling server
+    - `disconnected` : The slave was disconnected from the master
         Callback: `function()`
