@@ -1,5 +1,5 @@
 import Rx from 'rx'
-import { key } from './Peer'
+import { key } from '../Peer'
 import Peer from 'peerjs'
 
 export default function SlavePeer(masterPeerId) {

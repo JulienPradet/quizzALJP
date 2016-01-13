@@ -1,6 +1,6 @@
 import test from 'tape'
-import MasterPeer from '../../../src/client/webrtc/MasterPeer'
-import SlavePeer from '../../../src/client/webrtc/SlavePeer'
+import MasterPeer from '../../../src/client/webrtc/star_network/MasterPeer'
+import SlavePeer from '../../../src/client/webrtc/star_network/SlavePeer'
 
 test('Slaves should be able to connect to Master', function(t) {
   let master = MasterPeer()

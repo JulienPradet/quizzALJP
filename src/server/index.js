@@ -8,7 +8,7 @@ app.use('/public', express.static(__dirname+'/../public'))
 
 app.get('/favicon.ico', function(req, res) {})
 
-app.get('/', function(req, res) {
+app.get('*', function(req, res) {
   res.render('index')
 })
 

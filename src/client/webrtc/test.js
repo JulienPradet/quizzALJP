@@ -1,5 +1,5 @@
-import SlavePeer from './SlavePeer'
-import MasterPeer from './MasterPeer'
+import SlavePeer from './star_network/SlavePeer'
+import MasterPeer from './star_network/MasterPeer'
 
 export default function launchTest() {
   let currentPeer;

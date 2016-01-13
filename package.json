@@ -4,12 +4,15 @@
   "description": "",
   "main": "build/server/index.js",
   "dependencies": {
-    "easyrtc": "^1.0.15",
-    "ejs": "^2.3.4",
-    "express": "^4.13.3",
-    "immutable": "~3.7.6",
-    "peerjs": "^0.3.14",
-    "rx": "^4.0.7"
+    "ejs": "^2.3.*",
+    "express": "^4.13.*",
+    "immutable": "~3.7.*",
+    "peerjs": "^0.3.*",
+    "react": "^0.14.*",
+    "react-dom": "^0.14.*",
+    "react-router": "^1.0.*",
+    "history": "^1.17.*",
+    "rx": "^4.0.*"
   },
   "devDependencies": {
     "babel": "~6.3.26",
@@ -29,20 +32,16 @@
   },
   "scripts": {
     "clean": "rimraf dist && mkdir -p dist && mkdir -p dist/public",
-
     "prebuild": "npm run clean",
     "build:js": "babel src -d dist && browserify dist/client/index.js > dist/public/client.js",
     "build": "parallelshell 'npm run build:js'",
-
     "watch:browserify": "watchify src/client/index.js -t babelify -o dist/public/client.js",
     "watch": "parallelshell 'npm run watch:browserify'",
     "livereload": "livereload dist/public",
     "dev": "parallelshell 'npm run livereload' 'npm run watch'",
-
     "test:common": "babel-tape-runner test/common/**/*.test.js | tap-spec",
-    "test:client": "mkdir -p testdist/public && babel test/client -d testdist && browserify -t babelify test/client/**/*.js > testdist/public/client.js && node testdist/index.js",
+    "test:client": "mkdir -p testdist/public && babel test/client -d testdist && browserify -t babelify test/client/**/*.test.js > testdist/public/client.js && node testdist/index.js",
     "test": "npm run test:common && npm run test:client",
-
     "serve": "node dist/server/index.js",
     "prestart": "npm run build",
     "start": "npm run serve"
