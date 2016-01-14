@@ -1,9 +1,9 @@
 import React from 'react'
 import { Map } from 'immutable'
-import MasterPeer from '../../webrtc/MasterPeer'
+import Master from '../../webrtc/Master'
 import history from '../../util/history'
 
-export default class Master extends React.Component {
+export default class MasterComponent extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
@@ -12,13 +12,9 @@ export default class Master extends React.Component {
   }
 
   componentWillMount() {
-    const masterPeer = MasterPeer()
+    const master = Master()
       .on('connected', (masterId) => {
         this.setState({data: this.state.data.set('id', masterId)})
-        console.log(history.createPath({
-          pathname: 'viewer',
-          query: { masterId }
-        }))
         window.open(history.createHref('/viewer/'+masterId))
       })
   }
