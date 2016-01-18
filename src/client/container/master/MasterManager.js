@@ -1,17 +1,21 @@
 import history from '../../util/history'
 import Immutable from 'immutable'
+import Master from '../../communication/Master'
+import MasterPeer from '../../communication/adapter/star_network/webrtc/MasterPeer'
 import { Authenticator } from '../../communication/util/security'
 import AUTH_ACTIONS from '../../constants/security'
 import USERS_ACTIONS from '../../constants/users'
 import PEER_TYPE from '../../constants/peers'
 
 /* Connection of the master */
-function connection(master, getState, updateState) {
-  master
-    .on('connected', (masterId) => {
-      updateState({ data: getState().data.set('id', masterId) })
-      window.open(history.createHref('/viewer/'+masterId))
-    })
+function connection(master) {
+  return function connectionAux(getState, updateState) {
+    master
+      .on('connected', (masterId) => {
+        updateState({ data: getState().data.set('id', masterId) })
+        window.open(history.createHref('/viewer/'+masterId))
+      })
+  }
 }
 
 /* Store for the connected users => Immutable data store*/
@@ -21,8 +25,8 @@ let users = new Immutable.Map()
   .set(PEER_TYPE.PLAYER, new Immutable.List())
 
 /* Connection of other peers and authentication of them */
-function authentication(authenticator) {
-  return function authenticationAux(master, getState, updateState) {
+function authentication(master, authenticator) {
+  return function authenticationAux(getState, updateState) {
     master.message$.filter(({ type }) => type === AUTH_ACTIONS.AUTHENTICATE)
       .subscribe(({peerId, type, data}) => {
         /* Is the authentication a success ? */
@@ -41,22 +45,25 @@ function authentication(authenticator) {
 }
 
 /* A peer requested the list of users => Send it back */
-function requestUsers(master, getState, updateState) {
-  master.message$.filter(({ type }) => type === USERS_ACTIONS.GET_ALL)
-    .subscribe(({peerId, type, data}) => {
-      master.send(peerId, USERS_ACTIONS.ALL, users.toJS())
-    })
+function requestUsers(master) {
+  return function requestUsersAux(getState, updateState) {
+    master.message$.filter(({ type }) => type === USERS_ACTIONS.GET_ALL)
+      .subscribe(({peerId, type, data}) => {
+        master.send(peerId, USERS_ACTIONS.ALL, users.toJS())
+      })
+  }
 }
 
 /*
- * Global listener for master's actions
+ * Global manager for master's actions
  * The fact that it's in purely functional styles allows it to separate the
  * listeners in multiple files
  */
-export default function MasterListener(master, getState, updateState) {
+export default function MasterManager(getState, updateState) {
+  const master = Master(MasterPeer)
   const authenticator = Authenticator()
 
-  connection(master, getState, updateState)
-  authentication(authenticator)(master, getState, updateState)
-  requestUsers(master, getState, updateState)
+  connection(master)(getState, updateState)
+  authentication(master, authenticator)(getState, updateState)
+  requestUsers(master)(getState, updateState)
 }

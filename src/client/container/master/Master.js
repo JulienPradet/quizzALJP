@@ -1,8 +1,6 @@
 import React from 'react'
 import { Map } from 'immutable'
-import Master from '../../communication/Master'
-import MasterPeer from '../../communication/adapter/star_network/webrtc/MasterPeer'
-import MasterListener from './MasterListener'
+import MasterManager from './MasterManager'
 
 /**
  * Master component that lauches the master node
@@ -20,9 +18,7 @@ export default class MasterComponent extends React.Component {
   }
 
   componentWillMount() {
-    const master = this.master = Master(MasterPeer)
-    MasterListener(
-      master,
+    MasterManager(
       () => this.state,
       this.setState.bind(this)
     )

@@ -1,9 +1,6 @@
 import React from 'react'
-import Viewer from '../../communication/Viewer'
-import SlavePeer from '../../communication/adapter/star_network/webrtc/SlavePeer'
-import ViewerListener from './ViewerListener'
+import ViewerManager from './ViewerManager'
 import { Map } from 'immutable'
-import { STATE_TYPES } from '../../communication/StateManager.js'
 
 /**
  * The viewer component is the container for the viewer node
@@ -20,9 +17,7 @@ export default class ViewerComponent extends React.Component {
 
   componentWillMount() {
     const masterId = this.props.params.masterId
-    const viewer = Viewer(SlavePeer, masterId)
-    this.viewerActions = ViewerListener(
-      viewer,
+    this.viewerActions = ViewerManager(masterId)(
       () => this.state,
       this.setState.bind(this)
     )
@@ -49,7 +44,6 @@ export default class ViewerComponent extends React.Component {
         { this.state.data.get('connected') ? `I'm a viewer of ${this.props.params.masterId}!` : 'Connecting to the master' }
       </div>
       <div>
-        <button onClick={this.viewerActions.requestUsers}>UpdateUsers</button>
         { usersList }
       </div>
     </div>

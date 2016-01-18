@@ -1,5 +1,7 @@
-import USERS_ACTIONS from '../../constants/users'
 import { fromJS } from 'immutable'
+import Viewer from '../../communication/Viewer'
+import SlavePeer from '../../communication/adapter/star_network/webrtc/SlavePeer'
+import USERS_ACTIONS from '../../constants/users'
 
 /* Listen to the connection of the viewer to the master */
 function connection(viewer, getState, updateState) {
@@ -42,11 +44,11 @@ function updateUsers(viewer, getState, updateState) {
  * Actions triggered by the viewer are referenced in the object returned by this
  * function
  */
-export default function ViewerListener(viewer, getState, updateState) {
-  connection(viewer, getState, updateState)
-  updateUsers(viewer, getState, updateState)
+export default function ViewerManager(masterId) {
+  return function ViewerManagerAux(getState, updateState) {
+    const viewer = Viewer(SlavePeer, masterId)
 
-  return {
-    requestUsers: requestUsers(viewer)
+    connection(viewer, getState, updateState)
+    updateUsers(viewer, getState, updateState)
   }
 }
