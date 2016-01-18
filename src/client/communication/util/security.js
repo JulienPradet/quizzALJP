@@ -1,14 +1,4 @@
-export const MESSAGE_TYPE = {
-  AUTHENTICATE: 'AUTHENTICATE',
-  IS_AUTHENTICATED: 'IS_AUTHENTICATED',
-  AUTHENTICATION_FAILED: 'AUTHENTICATION_FAILED'
-}
-
-export const PEER_TYPE = {
-  VIEWER: 'VIEWER',
-  PLAYER: 'PLAYER',
-  MANAGER: 'MANAGER'
-}
+import MESSAGE_TYPE from '../../constants/security'
 
 export function login(peer, type, token) {
   peer.send(
@@ -21,7 +11,10 @@ export function login(peer, type, token) {
 }
 
 export function Authenticator() {
-  function _authenticate(token) {
+  const loggedIn = {}
+
+  function _authenticate(token, type) {
+    loggedIn[token] = type
     return {
       isAuthenticated: true,
       newToken: token
@@ -29,8 +22,8 @@ export function Authenticator() {
   }
 
   return {
-    authenticate(master, peerId, token) {
-      const { isAuthenticated, newToken } = _authenticate(token)
+    authenticate(master, peerId, type, token) {
+      const { isAuthenticated, newToken } = _authenticate(token, type)
 
       if(isAuthenticated) {
         master.send(
@@ -49,6 +42,12 @@ export function Authenticator() {
       }
 
       return isAuthenticated
+    },
+    isAuthenticated(token) {
+      return {
+        valid: loggedIn.hasOwnProperty(token),
+        type: loggedIn[token]
+      }
     }
   }
 }

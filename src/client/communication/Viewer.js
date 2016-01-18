@@ -1,4 +1,6 @@
-import { login, MESSAGE_TYPE, PEER_TYPE } from './util/security'
+import { login } from './util/security'
+import PEER_TYPE from '../constants/peers'
+import MESSAGE_TYPE from '../constants/security'
 
 const VIEWER = 'VIEWER'
 

@@ -22,11 +22,6 @@ export default function Master(PeerAdapter) {
     }
   })
 
-  // Manage authentication
-  const authenticator = Authenticator()
-  message$.filter(x => x.type === MESSAGE_TYPE.AUTHENTICATE)
-    .subscribe(({peerId, type, data}) => authenticator.authenticate(master, peerId, data.token))
-
   const master = {
     id() {
       return peer.id()
