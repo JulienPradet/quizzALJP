@@ -1,5 +1,5 @@
 import Rx from 'rx'
-import { key } from '../Peer'
+import { key } from '../../../Peer'
 import Peer from 'peerjs'
 
 export default function MasterPeer() {
@@ -50,8 +50,10 @@ export default function MasterPeer() {
     })
 
   function broadcast(data) {
+    console.log(data)
     for(var peerId in peer.connections) {
       peer.connections[peerId].forEach(function(conn) {
+        console.log('sent')
         conn.send(data)
       })
     }

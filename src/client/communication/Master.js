@@ -1,9 +1,8 @@
-import MasterPeer from './star_network/MasterPeer'
 import { Authenticator, MESSAGE_TYPE } from './util/security'
 
-export default function Master() {
+export default function Master(PeerAdapter) {
   const eventCallbacks = {}
-  const peer = MasterPeer()
+  const peer = PeerAdapter()
     .on('connected', function() {
       if(typeof eventCallbacks.connected === "function") {
         eventCallbacks.connected.apply(this, arguments)
@@ -49,6 +48,9 @@ export default function Master() {
           data
         }
       )
+    },
+    broadcast(type, data) {
+      peer.broadcast({ type, data })
     },
     message$
   }

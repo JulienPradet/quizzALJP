@@ -1,5 +1,4 @@
 // import launchQuizzTest from './quizz/test'
-import launchWebRtcTest from './webrtc/test'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute } from 'react-router'
@@ -23,6 +22,3 @@ function initWebApp() {
 }
 
 initWebApp()
-
-//launchTest()
-// launchWebRtcTest()

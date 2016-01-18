@@ -1,15 +1,14 @@
-import SlavePeer from './star_network/SlavePeer'
 import { login, MESSAGE_TYPE, PEER_TYPE } from './util/security'
 
 const VIEWER = 'VIEWER'
 
-export default function Viewer(masterId) {
+export default function Viewer(PeerAdapter, masterId) {
   const eventCallbacks = {}
   let token
 
   // Use a slave in order to define how the viewer should interact with the
   // master
-  const peer = SlavePeer(masterId)
+  const peer = PeerAdapter(masterId)
     // Authenticate as a viewer
     .on('connected', () => {
       login(viewer, PEER_TYPE.VIEWER, token)

@@ -11,7 +11,6 @@ export const PEER_TYPE = {
 }
 
 export function login(peer, type, token) {
-  console.log(peer)
   peer.send(
     MESSAGE_TYPE.AUTHENTICATE,
     {
