@@ -1,5 +1,6 @@
 import React from 'react'
 import { Map } from 'immutable'
+import history from '../../util/history'
 import MasterManager from './MasterManager'
 
 /**
@@ -19,8 +20,10 @@ export default class MasterComponent extends React.Component {
 
   componentWillMount() {
     MasterManager(
-      () => this.state,
-      this.setState.bind(this)
+      () => this.state.data,
+      (data) => {
+        this.setState({ data })
+      }
     )
   }
 
@@ -29,9 +32,14 @@ export default class MasterComponent extends React.Component {
       ? <div>My id is { this.state.data.get('id') }.</div>
       : <div>I'm not connected yet.</div>
 
+    const viewerButton = this.state.data.has('id')
+      ? <button onClick={ () => { window.open(history.createHref('/viewer/'+this.state.data.get('id'))) } }>Open a viewer</button>
+      : null
+
     return <div>
       <h1>I'm a master!</h1>
       { currentId }
+      { viewerButton }
     </div>
   }
 }

@@ -18,8 +18,10 @@ export default class ViewerComponent extends React.Component {
   componentWillMount() {
     const masterId = this.props.params.masterId
     this.viewerActions = ViewerManager(masterId)(
-      () => this.state,
-      this.setState.bind(this)
+      () => this.state.data,
+      (data) => {
+        this.setState({ data })
+      }
     )
   }
 

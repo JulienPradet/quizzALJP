@@ -1,4 +1,3 @@
-import history from '../../util/history'
 import Immutable from 'immutable'
 import Master from '../../communication/Master'
 import MasterPeer from '../../communication/adapter/star_network/webrtc/MasterPeer'
@@ -12,8 +11,7 @@ function connection(master) {
   return function connectionAux(getState, updateState) {
     master
       .on('connected', (masterId) => {
-        updateState({ data: getState().data.set('id', masterId) })
-        window.open(history.createHref('/viewer/'+masterId))
+        updateState(getState().set('id', masterId))
       })
   }
 }

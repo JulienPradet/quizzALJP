@@ -41,7 +41,7 @@
     "livereload": "livereload dist/public",
     "dev": "parallelshell 'npm run livereload' 'npm run watch'",
     "test:common": "babel-tape-runner test/common/**/*.test.js | tap-spec",
-    "test:client": "mkdir -p testdist/public && babel test/client -d testdist && browserify -t babelify test/client/**/*.test.js > testdist/public/client.js && node testdist/index.js",
+    "test:client": "mkdir -p testdist/public && babel test/client -d testdist && browserify -t babelify test/client/client.js > testdist/public/client.js && node testdist/index.js",
     "test": "npm run test:common && npm run test:client",
     "serve": "node dist/server/index.js",
     "prestart": "npm run build",

@@ -47,6 +47,9 @@ export default function Master(PeerAdapter) {
     broadcast(type, data) {
       peer.broadcast({ type, data })
     },
+    disconnect() {
+      peer.disconnect()
+    },
     message$
   }
 

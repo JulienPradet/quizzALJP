@@ -50,10 +50,8 @@ export default function MasterPeer() {
     })
 
   function broadcast(data) {
-    console.log(data)
     for(var peerId in peer.connections) {
       peer.connections[peerId].forEach(function(conn) {
-        console.log('sent')
         conn.send(data)
       })
     }

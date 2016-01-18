@@ -67,6 +67,9 @@ export default function Viewer(PeerAdapter, masterId) {
         data
       })
     },
+    disconnect() {
+      peer.disconnect()
+    },
     message$
   }
 

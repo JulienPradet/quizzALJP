@@ -6,7 +6,7 @@ import USERS_ACTIONS from '../../constants/users'
 /* Listen to the connection of the viewer to the master */
 function connection(viewer, getState, updateState) {
   viewer.on('connected', () => {
-    updateState({data: getState().data.set('connected', true)})
+    updateState(getState().set('connected', true))
   })
 }
 
@@ -33,7 +33,7 @@ function updateUsers(viewer, getState, updateState) {
       return type === USERS_ACTIONS.ALL
     })
     .subscribe(({ type, data }) => {
-      updateState({ data: getState().data.set('users', data)})
+      updateState(getState().set('users', data))
     })
 }
 
@@ -50,5 +50,11 @@ export default function ViewerManager(masterId) {
 
     connection(viewer, getState, updateState)
     updateUsers(viewer, getState, updateState)
+
+    return {
+      disconnect() {
+        master.disconnect()
+      }
+    }
   }
 }
