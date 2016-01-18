@@ -4,7 +4,13 @@ import Master from '../../communication/Master'
 import MasterPeer from '../../communication/adapter/star_network/webrtc/MasterPeer'
 import MasterListener from './MasterListener'
 
-
+/**
+ * Master component that lauches the master node
+ * The node launches the MasterListener which actually the one responsible of
+ * the business logic.
+ * The container only uses dumb components. That's the top level component of
+ * the App.
+ */
 export default class MasterComponent extends React.Component {
   constructor(props, context) {
     super(props, context)
@@ -15,7 +21,6 @@ export default class MasterComponent extends React.Component {
 
   componentWillMount() {
     const master = this.master = Master(MasterPeer)
-    console.log(this)
     MasterListener(
       master,
       () => this.state,

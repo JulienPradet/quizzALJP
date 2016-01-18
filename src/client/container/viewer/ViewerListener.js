@@ -8,8 +8,23 @@ function connection(viewer, getState, updateState) {
   })
 }
 
+function requestUsers(viewer) {
+  return function() {
+    viewer.send(USERS_ACTIONS.GET_ALL, {})
+  }
+}
+
 /* Update the list of users since the list has been received from the master */
 function updateUsers(viewer, getState, updateState) {
+  // Should update ?
+  viewer.message$
+    .filter(({ type }) => {
+      return type === USERS_ACTIONS.USERS_HAS_UPDATED
+    })
+    .subscribe(() => {
+      requestUsers(viewer)()
+    })
+
   // Manage state updates
   viewer.message$
     .filter(({ type }) => {
@@ -32,8 +47,6 @@ export default function ViewerListener(viewer, getState, updateState) {
   updateUsers(viewer, getState, updateState)
 
   return {
-    requestUsers() {
-      viewer.send(USERS_ACTIONS.GET_ALL, {})
-    }
+    requestUsers: requestUsers(viewer)
   }
 }
