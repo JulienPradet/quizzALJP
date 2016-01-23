@@ -5,7 +5,7 @@ import { Router, Route, IndexRoute } from 'react-router'
 import history from './util/history'
 import App from './container/App'
 import Landing from './container/Landing'
-import Master from './container/master/Master'
+import Manager from './container/manager/Manager'
 import Viewer from './container/viewer/Viewer'
 
 function initWebApp() {
@@ -13,7 +13,7 @@ function initWebApp() {
     <Router history={history}>
       <Route path="/" component={App}>
         <IndexRoute component={Landing} />
-        <Route path="master" component={Master} />
+        <Route path="manager" component={Manager} />
         <Route path="viewer/:masterId" component={Viewer} />
       </Route>
     </Router>,

@@ -45,7 +45,7 @@ function updateUsers(viewer, getState, updateState) {
  * function
  */
 export default function ViewerManager(masterId) {
-  return function ViewerManagerAux(getState, updateState) {
+  return function ViewerManagerAux(getState = () => {}, updateState = (data) => {}) {
     const viewer = Viewer(SlavePeer, masterId)
 
     connection(viewer, getState, updateState)

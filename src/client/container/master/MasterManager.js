@@ -57,7 +57,7 @@ function requestUsers(master) {
  * The fact that it's in purely functional styles allows it to separate the
  * listeners in multiple files
  */
-export default function MasterManager(getState, updateState) {
+export default function MasterManager(getState = () => {}, updateState = (data) => {}) {
   const master = Master(MasterPeer)
   const authenticator = Authenticator()
 
