@@ -1,13 +1,13 @@
 import Rx from 'rx'
-import { key } from '../../../Peer'
 import Peer from 'peerjs'
+import parameters from '../../../../../config/parameters'
 
 export default function SlavePeer(masterPeerId) {
   const message$ = new Rx.Subject()
   const eventCallbacks = {}
   let conn
 
-  const peer = new Peer({ key })
+  const peer = new Peer({ key: parameters.peerjs.key })
     .on('open', function() {
       console.info('Slave: Connected. Attempting to connect to master.')
 
