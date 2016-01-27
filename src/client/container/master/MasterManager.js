@@ -25,6 +25,14 @@ let users = new Immutable.Map()
 /* Connection of other peers and authentication of them */
 function authentication(master, authenticator) {
   return function authenticationAux(getState, updateState) {
+    master.on('slaveDisconnected', function(peerId) {
+      users = users.map((subUsers) => {
+        return subUsers.filter((id) => id !== peerId)
+      })
+
+      master.broadcast(USERS_ACTIONS.USERS_HAS_UPDATED, {})
+    })
+
     master.message$.filter(({ type }) => type === AUTH_ACTIONS.AUTHENTICATE)
       .subscribe(({peerId, type, data}) => {
         /* Is the authentication a success ? */

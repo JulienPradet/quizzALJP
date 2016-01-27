@@ -32,7 +32,7 @@ export default class ManagerComponent extends React.Component {
       ? <div>I'm truly a manager now.</div>
       : <div>I'm not connected yet.</div>
 
-    const viewerButton = this.state.data.has('masterId')
+    const viewerButton = this.state.data.has('masterId') && this.state.data.get('connected')
       ? <button onClick={ () => { window.open(history.createHref('/viewer/'+this.state.data.get('masterId'))) } }>Open a viewer</button>
       : null
 

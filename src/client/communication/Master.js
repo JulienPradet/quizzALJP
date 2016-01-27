@@ -13,6 +13,11 @@ export default function Master(PeerAdapter) {
         eventCallbacks.disconnected.apply(this, arguments)
       }
     })
+    .on('slaveDisconnected', function() {
+      if(typeof eventCallbacks.slaveDisconnected === "function") {
+        eventCallbacks.slaveDisconnected.apply(this, arguments)
+      }
+    })
 
   const message$ = peer.message$().map(x => {
     return {
@@ -27,7 +32,7 @@ export default function Master(PeerAdapter) {
       return peer.id()
     },
     on(event, callback) {
-      if(['connected', 'disconnected'].indexOf(event) >= 0) {
+      if(['connected', 'disconnected', 'slaveDisconnected'].indexOf(event) >= 0) {
         eventCallbacks[event] = callback
       } else {
         console.warn('Wrong event name')

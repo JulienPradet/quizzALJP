@@ -10,7 +10,7 @@ export default class Landing extends React.Component {
       return <div>
         <div>
           <div>I've got the spirit of a leader:</div>
-          <div><Link to="master">Let's party!</Link></div>
+          <div><Link to="manager">Let's party!</Link></div>
         </div>
       </div>
     }
