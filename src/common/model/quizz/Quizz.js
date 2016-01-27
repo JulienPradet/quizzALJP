@@ -66,6 +66,15 @@ export default function Quizz(options) {
       })
     },
 
+    removeStep(stepKey) {
+      const res = Quizz({
+        key: this.key(),
+        steps: this.steps().delete(stepKey)
+      })
+      console.log(res);
+      return res;
+    },
+
     /**
      * Update a given step
      * @return Quizz with the new step
