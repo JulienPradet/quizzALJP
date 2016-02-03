@@ -2,7 +2,7 @@
 import launchWebRtcTest from './webrtc/test'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import QuizzCreator from './container/QuizzCreator'
+import QuizzCreator from './container/quizz/QuizzCreator'
 
 //launchTest()
 launchWebRtcTest()

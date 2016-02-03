@@ -71,7 +71,6 @@ export default function Quizz(options) {
         key: this.key(),
         steps: this.steps().delete(stepKey)
       })
-      console.log(res);
       return res;
     },
 
@@ -82,7 +81,7 @@ export default function Quizz(options) {
     setStep(newStep, stepKey) {
       return Quizz({
         key: this.key(),
-        steps: this.steps.set(stepKey, newStep)
+        steps: this.steps().set(stepKey, newStep)
       })
     },
 
@@ -100,6 +99,10 @@ export default function Quizz(options) {
           steps: this.steps().shift()
         })
       }
+    },
+
+    toString() {
+      return `Quizz(${this.key()} / ${this.steps().count()} step(s))`
     }
   };
 }

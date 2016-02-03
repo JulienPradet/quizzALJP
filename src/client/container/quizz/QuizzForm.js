@@ -1,13 +1,13 @@
 import React from 'react'
 import QuizzFormManager from './QuizzFormManager'
-import Quizz from '../../common/model/quizz/Quizz'
-import QuizzStepForm from '../components/quizz/QuizzStepForm'
+import Quizz from '../../../common/model/quizz/Quizz'
+import QuizzStepForm from '../../components/quizz/QuizzStepForm'
+import SaveForm from '../../components/quizz/SaveForm'
 
 export default class QuizzForm extends React.Component {
   constructor(props) {
     super(props)
 
-    console.log(props);
     if(props.hasOwnProperty('quizz')) {
       this.state = { quizz: props.quizz }
     } else if(props.hasOwnProperty('quizzKey')) {
@@ -35,6 +35,7 @@ export default class QuizzForm extends React.Component {
 
       <form onSubmit={this.actions.save}>
         <QuizzStepForm key={this.state.quizz.key()} step={this.state.quizz} onUpdate={this.actions.update}/>
+        <SaveForm onSave={this.actions.save} />
       </form>
     </div>
   }

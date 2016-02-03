@@ -3,7 +3,7 @@ import { Map } from 'immutable'
 import QuizzForm from './QuizzForm'
 import ImportQuizzForm from './ImportQuizzForm'
 import ExportQuizzForm from './ExportQuizzForm'
-import QuizzManager from './QuizzManager'
+import QuizzCreatorManager from './QuizzCreatorManager'
 
 export default class QuizzCreator extends React.Component {
   constructor(props) {
@@ -15,7 +15,7 @@ export default class QuizzCreator extends React.Component {
   }
 
   componentWillMount() {
-    this.actions = QuizzManager(
+    this.actions = QuizzCreatorManager(
       () => this.state.data,
       (data) => this.setState({ data })
     )
