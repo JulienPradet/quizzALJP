@@ -19,7 +19,7 @@ export default class ManagerComponent extends React.Component {
   }
 
   componentWillMount() {
-    ManagerManager(
+    this.actions = ManagerManager(
       () => this.state.data,
       (data) => {
         this.setState({ data })
@@ -36,10 +36,19 @@ export default class ManagerComponent extends React.Component {
       ? <button onClick={ () => { window.open(history.createHref('/viewer/'+this.state.data.get('masterId'))) } }>Open a viewer</button>
       : null
 
+    const authorizePlayersButtonLabel = this.state.data.has("authorizedPlayers") && this.state.data.get("authorizedPlayers")
+      ? "Forbid players"
+      : "Authorize players"
+
+    const authorizePlayersButton = this.state.data.has('masterId') && this.state.data.get('connected')
+      ? <button onClick={ () => { this.actions.togglePlayerAuthorization() } }>{authorizePlayersButtonLabel}</button>
+      : null
+
     return <div>
       <h1>I'm a manager!</h1>
       { currentId }
       { viewerButton }
+      { authorizePlayersButton }
     </div>
   }
 }

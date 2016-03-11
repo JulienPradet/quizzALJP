@@ -60,6 +60,29 @@ function requestUsers(master) {
   }
 }
 
+/* A peer manager open or close connections to players */
+function authenticationGuardian(master, authenticator) {
+  return function authenticationGuardianAux(getState, updateState) {
+    master.message$
+      .subscribe((data) => {
+        console.log(data)
+      })
+    master.message$.filter(({ type }) => type === AUTH_ACTIONS.OPEN_TO_PLAYERS)
+      .subscribe(({peerId, type, data}) => {
+        console.log(peerId, type, data)
+        authenticator.openToPlayers()
+        master.send(peerId, AUTH_ACTIONS.OPENED_TO_PLAYERS)
+      })
+
+    master.message$.filter(({ type }) => type === AUTH_ACTIONS.CLOSE_TO_PLAYERS)
+      .subscribe(({peerId, type, data}) => {
+        console.log(peerId, type, data)
+        authenticator.closeToPlayers()
+        master.send(peerId, AUTH_ACTIONS.CLOSED_TO_PLAYERS)
+      })
+  }
+}
+
 /*
  * Global manager for master's actions
  * The fact that it's in purely functional styles allows it to separate the
@@ -72,4 +95,5 @@ export default function MasterManager(getState = () => {}, updateState = (data) 
   connection(master)(getState, updateState)
   authentication(master, authenticator)(getState, updateState)
   requestUsers(master)(getState, updateState)
+  authenticationGuardian(master, authenticator)(getState, updateState)
 }
