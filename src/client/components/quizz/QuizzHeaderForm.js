@@ -1,6 +1,7 @@
 import React from 'react'
 import { FormGroup } from '../ui/FormLayout'
 import FormLine from '../ui/form/FormLine'
+import Block from '../ui/Block'
 
 export default class QuizzHeaderForm extends React.Component {
   constructor() {
@@ -22,9 +23,10 @@ export default class QuizzHeaderForm extends React.Component {
   }
 
   render() {
-    return <FormGroup legend="Welcome to the quizz editor !" fieldset={true}>
-      <FormLine id={this.props.quizz.key()+'.name'} label="Quizz name:" value={this.props.quizz.name()} onChange={this.updateName} />
-      <FormLine id={this.props.quizz.key()+'.key'} label="Quizz key:" value={this.props.quizz.key()} onChange={this.updateKey} />
-    </FormGroup>
+    return <Block>
+      <FormGroup legend="Main information" fieldset={true}>
+        <FormLine id={this.props.quizz.key()+'.name'} label="Quizz name:" value={this.props.quizz.name()} onChange={this.updateName} />
+      </FormGroup>
+    </Block>
   }
 }

@@ -5,3 +5,4 @@ node_modules
 .remote-sync.json
 .sass-cache
 npm-debug.log
+ignore

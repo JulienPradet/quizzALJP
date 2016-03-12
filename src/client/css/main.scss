@@ -1,5 +1,25 @@
+@import './_vars';
+
 body {
-  color: red;
-  background: #444444;
-  text-align: center;
+  background: $backgroundColor;
+  color: $color;
+  font-family: 'Lato', sans-serif;
+  font-size: 1.1em;
+  width: 50%;
+  margin: 5% auto 0;
 }
+
+a {
+  color: $linkColor;
+  &.active, &:hover, &:focus {
+    color: $activeColor;
+  }
+}
+
+@import './global/format';
+@import './global/button';
+@import './global/form';
+
+@import './components/blocks';
+@import './components/tooltip';
+@import './components/quizz-creator-steps';

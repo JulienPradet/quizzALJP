@@ -11,7 +11,9 @@ export default function QuizzFormManager(getState, updateState) {
     const key = parentKey+path.last()
 
     return data.get('type') === 'quizz'
-      ? Quizz({ key })
+      ? Quizz({
+        key
+      })
       : questions.get('simpleQuestion')({
         key,
         title: '',
@@ -35,9 +37,30 @@ export default function QuizzFormManager(getState, updateState) {
       }
     }
 
-    console.log(getState().quizz.name(), updateQuizzAux(stepPath, step, getState().quizz).name())
-
     return updateQuizzAux(stepPath, step, getState().quizz)
+  }
+
+  function removeStep(path) {
+    function removeStepAux(path, quizz) {
+      if(path.count() === 0) {
+        return quizz
+      } else {
+        const entry = quizz.steps().findEntry(function(step) {
+          return step.key() === path.first()
+        })
+        if(entry) {
+          if(path.count() === 1) {
+            return quizz.removeStep(entry[0])
+          } else {
+            return quizz.setStep(removeStepAux(path.shift(), entry[1]), entry[0])
+          }
+        } else {
+          return quizz
+        }
+      }
+    }
+
+    return removeStepAux(path, getState().quizz)
   }
 
   return {
@@ -49,20 +72,25 @@ export default function QuizzFormManager(getState, updateState) {
         activePath: path
       })
     },
-    addStep(path, id) {
-      return (data) => {
-        const newStep = dataToStep(data, path.push(id))
-        updateState({
-          quizz: updateQuizz(path.push(id), newStep),
-          activePath: path.push(newStep.key())
-        })
+    addStep(path, id, data) {
+      let newStep = dataToStep(data, path.push(id))
+      if(data.get('type') === 'quizz') {
+        newStep = newStep.setName('Step '+(id + 1))
       }
+      updateState({
+        quizz: updateQuizz(path.push(id), newStep),
+        activePath: path.push(newStep.key())
+      })
     },
-    setQuestion(path) {
-      return (question) => {
+    removeStep(path) {
+      updateState({
+        quizz: removeStep(path)
+      })
+    },
+    setStep(path) {
+      return (step) => {
         updateState({
-          quizz: updateQuizz(path, question),
-          activePath: path.push(question.key())
+          quizz: updateQuizz(path, step)
         })
       }
     }

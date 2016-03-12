@@ -1,54 +1,54 @@
 import React from 'react'
+import { List } from 'immutable'
+import QuizzHeaderForm from './QuizzHeaderForm'
 import QuestionForm from './QuestionForm'
-import AddStepForm from './AddStepForm'
+import QuizzStepHead from './QuizzStepHead'
 import RemoveStepForm from './RemoveStepForm'
-import Quizz from '../../../common/model/quizz/Quizz'
-import questions from '../../../common/model/quizz/questions/questions'
+import Block from '../ui/Block'
+import { Button } from '../ui/FormBase'
 import { FormGroup } from '../ui/FormLayout'
 
 export default class QuizzStepForm extends React.Component {
-  updateStep(newStep) {
-    this.props.onUpdate(this.props.step.setStep(newStep, newStep.key()))
-  }
-
-  addStep(stepDefinition) {
-    const key = this.props.step.steps().count();
-
-    const step = stepDefinition.get('type')
-    const newStep = (step === 'quizz')
-      ? Quizz({ key })
-      : questions.get('simpleQuestion')({
-        key: key,
-        title: '',
-        answer: ''
-      })
-
-    this.props.onUpdate(this.props.step.addStep(newStep, key))
-  }
-
-  removeStep(key) {
-    return function() {
-      this.props.onUpdate(this.props.step.removeStep(key))
-    }
-  }
-
   render() {
-    return <div>
-      {
-        this.props.step.steps()
-          .map(step => {
-            const StepComponent = typeof step.addStep === 'function'
-              ? <QuizzStepForm step={step} onUpdate={this.updateStep.bind(this)} />
-              : <QuestionForm question={step} onUpdate={this.updateStep.bind(this)} />
+    let {activePath, quizz, accumulatedPath} = this.props
+    if(!quizz) {
+      return
+    }
 
-            return <FormGroup key={step.key()}>
-              { StepComponent }
-              <RemoveStepForm removeStep={this.removeStep(step.key()).bind(this)}/>
-            </FormGroup>
-          })
-      }
+    const activeStep = quizz.steps().find((step) => step.key() === activePath.first())
+    const activeStepKey = activeStep ? activeStep.key() : 'main'
 
-      <AddStepForm addStep={this.addStep.bind(this)} />
-    </div>
+    const activeStepComponent = activeStep
+      ? (activeStep.steps
+        ? <QuizzStepForm
+            activePath={activePath.shift()}
+            quizz={activeStep}
+            accumulatedPath={accumulatedPath.push(activeStep.key())}
+            addStep={this.props.addStep}
+            removeStep={this.props.removeStep}
+            setStep={this.props.setStep}
+            updatePath={this.props.updatePath}
+          />
+        : <QuestionForm question={activeStep} onUpdate={this.props.setStep(accumulatedPath.push(activeStepKey))} />)
+      : <QuizzHeaderForm quizz={quizz} onUpdate={this.props.setStep(accumulatedPath)} />
+
+    return (
+      <div>
+        <QuizzStepHead
+          activeStepKey={activeStepKey}
+          accumulatedPath={accumulatedPath}
+          quizz={quizz}
+          addStep={this.props.addStep}
+          removeStep={this.props.removeStep}
+          updatePath={this.props.updatePath}
+          />
+
+        { activeStepComponent
+          ? <FormGroup legend="Current Step" fieldset={true} className="block block--small">
+            { activeStepComponent }
+          </FormGroup>
+          : null }
+      </div>
+    )
   }
 }

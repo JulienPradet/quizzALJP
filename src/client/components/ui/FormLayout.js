@@ -7,7 +7,9 @@ export function FormGroup(props) {
 
   const Component = props.fieldset ? "fieldset" : "div"
 
-  return <Component className="form__group">
+  const className = "form_group " + (props.className || '')
+
+  return <Component className={className}>
     {legend}
     {props.children}
   </Component>

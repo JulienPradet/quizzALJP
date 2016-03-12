@@ -2,6 +2,7 @@ import React from 'react'
 import questions from '../../../common/model/quizz/questions/questions'
 import { FormGroup, FormLabel, FormInput } from '../ui/FormLayout'
 import { Label, Input } from '../ui/FormBase'
+import Block from '../ui/Block'
 
 export default class QuestionForm extends React.Component {
   updateTitle(event) {
@@ -25,7 +26,7 @@ export default class QuestionForm extends React.Component {
   }
 
   render() {
-    return <div>
+    return <Block>
       <FormGroup>
         <FormLabel htmlFor={this.props.question.key()+'__title'}>
           <Label>Title</Label>
@@ -43,6 +44,6 @@ export default class QuestionForm extends React.Component {
           <Input id={this.props.question.key()+'__answer'} name={this.props.question.key()+'__answer'} value={this.props.question.answer()} onChange={this.updateAnswer.bind(this)} />
         </FormInput>
       </FormGroup>
-    </div>
+    </Block>
   }
 }
