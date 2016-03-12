@@ -30,12 +30,32 @@ export default function Quizz(options) {
    */
   const steps = options.hasOwnProperty('steps') && List.isList(options.steps) ? options.steps : List()
 
+  const name = options.name || ('Step ' + options.key)
+
   return {
     /**
      * Get the key of the quizz
      * @return string
      */
     key() { return options.key },
+
+    /**
+     * Name that should be displayed to authentify a step
+     * @return string
+     */
+    name() { return name },
+
+    /**
+     * Edit the name of the quizz
+     * @return Quizz
+     */
+    setName(name) {
+      return Quizz({
+        key: this.key(),
+        name: name,
+        steps: steps
+      })
+    },
 
     /**
      * Get the remaining steps of the quizz

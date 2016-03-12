@@ -34,7 +34,7 @@
     "prebuild": "npm run clean",
     "build:js": "babel src -d dist && browserify dist/client/index.js > dist/public/client.js",
     "build": "parallelshell 'npm run build:js'",
-    "watch:browserify": "watchify src/client/index.js -t babelify -o dist/public/client.js",
+    "watch:browserify": "watchify --debug src/client/index.js -t babelify -o dist/public/client.js",
     "watch": "parallelshell 'npm run watch:browserify'",
     "livereload": "livereload dist/public",
     "dev": "parallelshell 'npm run livereload' 'npm run watch'",

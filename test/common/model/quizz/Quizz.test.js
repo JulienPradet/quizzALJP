@@ -23,13 +23,25 @@ test('instanciate a Quizz without the options and without key should throw an er
 test('a Quizz should be instanciate with a key', function(t) {
   const quizz = Quizz({
     key: 'key'
-  });
+  })
 
-  t.equal(quizz.key(), 'key');
-  t.ok(is(quizz.steps(), List()));
+  t.equal(quizz.key(), 'key')
+  t.ok(is(quizz.steps(), List()))
 
-  t.end();
+  t.end()
 });
+
+test('a Quizz can have a name', function(t) {
+  const quizz = Quizz({ key: 'key', name: 'name' })
+  t.equal(quizz.name(), 'name')
+  t.end()
+})
+
+test('a Quizz\'s name can be edited', function(t) {
+  const quizz = Quizz({ key: 'key', name: 'name' })
+  t.equal(quizz.setName('name2').name(), 'name2')
+  t.end()
+})
 
 test('a Quizz should have steps', function(t) {
   const SimpleQuestion = questions.get('simpleQuestion')
