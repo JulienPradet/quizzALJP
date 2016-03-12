@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import QuizzCreator from './container/quizz/QuizzCreator'
 
 //launchTest()
-launchWebRtcTest()
+// launchWebRtcTest()
 
 ReactDOM.render(
   <QuizzCreator />,

@@ -1,7 +1,16 @@
 import React from 'react'
 
 export function FormGroup(props) {
-  return <fieldset className="form__group">{props.children}</fieldset>
+  const legend = props.legend
+    ? <legend>{props.legend}</legend>
+    : null
+
+  const Component = props.fieldset ? "fieldset" : "div"
+
+  return <Component className="form__group">
+    {legend}
+    {props.children}
+  </Component>
 }
 
 export function FormInput(props) {

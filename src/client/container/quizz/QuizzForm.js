@@ -4,62 +4,97 @@ import QuizzFormManager from './QuizzFormManager'
 import Quizz from '../../../common/model/quizz/Quizz'
 import QuestionForm from '../../components/quizz/QuestionForm'
 import StepPathForm from '../../components/quizz/StepPathForm'
+import AddStepForm from '../../components/quizz/AddStepForm'
 import SaveForm from '../../components/quizz/SaveForm'
 import QuizzHeaderForm from '../../components/quizz/QuizzHeaderForm'
+
+import { FormGroup } from '../../components/ui/FormLayout'
 
 export default class QuizzForm extends React.Component {
   constructor(props) {
     super(props)
 
+    this.saveQuizz = this.saveQuizz.bind(this)
+
     if(props.hasOwnProperty('quizz')) {
-      this.state = { quizz: props.quizz }
-    } else if(props.hasOwnProperty('quizzKey')) {
       this.state = {
-        quizz: Quizz({
-          key: props.quizzKey,
-        }),
-        activePath: new List(),
+        quizz: props.quizz,
+        activePath: new List()
       }
     } else {
-      throw new Error('A key must be defined.')
+      throw new Error('A quizz must be defined.')
     }
   }
 
   componentWillMount() {
     this.actions = QuizzFormManager(
-      () => this.state.quizz,
-      (quizz) => this.setState({quizz})
+      () => this.state,
+      (state) => this.setState(state)
     )
+  }
+
+  saveQuizz() {
+    this.props.saveQuizz(this.state.quizz)
   }
 
   renderQuizzHeader(quizz) {
     return <QuizzHeaderForm quizz={quizz} onUpdate={this.actions.update} />
   }
 
-  renderForm(activeSubPath, quizz, accumulatedPath) {
-    if(typeof accumulatedPath === 'undefined') {
-      accumulatedPath = new List([quizz.key()])
+  renderForm(activePath, quizz, accumulatedPath) {
+    if(!quizz) {
+      return
     }
 
-    const activeStepKey = activeSubPath.first()
-    const steps = this.state.quizz.steps()
+    let activeStepKey = activePath.count() > 0
+      ? activePath.first()
+      : null
 
-    const stepsPath = steps.map(function(step) {
-      return <StepPathForm active={step.key() === activeStepKey} step={step} onUpdate={(step) => this.actions.updatePath(accumulatedPath.push(step.key()), step)}/>
+    const activeStep = quizz.steps().find((step) => step.key() === activePath.first()) || quizz.steps().first()
+    activeStepKey = activeStep ? activeStep.key() : activeStepKey
+
+
+    if(typeof accumulatedPath === 'undefined') {
+      accumulatedPath = new List()
+    }
+
+    const stepsPath = quizz.steps().map((step) => {
+      return <StepPathForm
+        key={step.key()}
+        active={step.key() === activePath.first()}
+        step={step}
+        onSelect={() => this.actions.updatePath(accumulatedPath.push(step.key()))}
+      />
     })
 
-    if(activeStepKey) {
-      const activeStep = steps.find((step) => step.key() === activeStepKey)
-      if(activeStep) {
-        stepsPath.push(
-          typeof activeStep.steps === 'function'
-            ? this.renderForm(activeSubPath.shift(), activeStep, [...accumulatedPath, activeStepKey])
-            : <QuestionForm question={activeStep} onUpdate={this.actions.updatePath.bind(this)} />
-        )
-      }
-    }
+    const addStepForm = <AddStepForm quizz={quizz} addStep={this.actions.addStep(accumulatedPath, quizz.steps().count())} />
 
-    return stepsPath
+    const activeStepComponent = activeStep
+      ? (activeStep.steps
+        ? this.renderForm(
+          activePath.shift(),
+          activeStep,
+          accumulatedPath.push(activeStep.key())
+        )
+        : <QuestionForm question={activeStep} onUpdate={this.actions.setQuestion(accumulatedPath.push(activeStep.key()))} />)
+      : null
+
+    return (
+      <div>
+        <FormGroup legend="Steps" fieldset={true}>
+          { stepsPath }
+          { addStepForm }
+        </FormGroup>
+
+        {
+          activeStepComponent
+            ? <FormGroup legend="Current Step" fieldset={true}>
+              { activeStepComponent }
+            </FormGroup>
+            : null
+        }
+      </div>
+    )
   }
 
   render() {
@@ -67,7 +102,7 @@ export default class QuizzForm extends React.Component {
       <form onSubmit={this.actions.save}>
         { this.renderQuizzHeader(this.state.quizz) }
         { this.renderForm(this.state.activePath, this.state.quizz) }
-        <SaveForm onSave={this.actions.save} />
+        <SaveForm onSave={this.saveQuizz} />
       </form>
     </div>
   }

@@ -8,10 +8,6 @@ import QuizzCreatorManager from './QuizzCreatorManager'
 export default class QuizzCreator extends React.Component {
   constructor(props) {
     super(props)
-
-    this.state = {
-      data: new Map()
-    }
   }
 
   componentWillMount() {
@@ -23,10 +19,10 @@ export default class QuizzCreator extends React.Component {
 
   render() {
     return <div>
-      <QuizzForm saveQuizz={this.actions.saveQuizz} quizzKey="myquizz" />
+      <QuizzForm saveQuizz={this.actions.saveQuizz} quizz={this.state.data.quizz} />
 
-      <ExportQuizzForm />
-      <ImportQuizzForm />
+      {/*<ExportQuizzForm />
+      <ImportQuizzForm />*/}
     </div>
   }
 }

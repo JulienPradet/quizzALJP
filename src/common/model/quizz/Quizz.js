@@ -30,7 +30,7 @@ export default function Quizz(options) {
    */
   const steps = options.hasOwnProperty('steps') && List.isList(options.steps) ? options.steps : List()
 
-  const name = options.name || ('Step ' + options.key)
+  const name = typeof options.name === 'string' ? options.name : ('Step ' + options.key)
 
   return {
     /**
@@ -46,6 +46,18 @@ export default function Quizz(options) {
     name() { return name },
 
     /**
+     * Edit the key of the quizz
+     * @return Quizz
+     */
+    setKey(key) {
+      return Quizz({
+        key: key,
+        name: this.name(),
+        steps: this.steps()
+      })
+    },
+
+    /**
      * Edit the name of the quizz
      * @return Quizz
      */
@@ -53,7 +65,7 @@ export default function Quizz(options) {
       return Quizz({
         key: this.key(),
         name: name,
-        steps: steps
+        steps: this.steps()
       })
     },
 
@@ -82,6 +94,7 @@ export default function Quizz(options) {
     addStep(step) {
       return Quizz({
         key: this.key(),
+        name: this.name(),
         steps: List.isList(step) ? this.steps().concat(step) : this.steps().push(step)
       })
     },
@@ -89,6 +102,7 @@ export default function Quizz(options) {
     removeStep(stepKey) {
       const res = Quizz({
         key: this.key(),
+        name: this.name(),
         steps: this.steps().delete(stepKey)
       })
       return res;
@@ -101,6 +115,7 @@ export default function Quizz(options) {
     setStep(newStep, stepKey) {
       return Quizz({
         key: this.key(),
+        name: this.name(),
         steps: this.steps().set(stepKey, newStep)
       })
     },
@@ -116,6 +131,7 @@ export default function Quizz(options) {
         step: this.steps().first(),
         quizz: Quizz({
           key: this.key(),
+          name: this.name(),
           steps: this.steps().shift()
         })
       }
