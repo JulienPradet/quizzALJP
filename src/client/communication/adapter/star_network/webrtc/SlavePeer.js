@@ -1,19 +1,21 @@
 import Rx from 'rx'
-import { key } from './Peer'
 import Peer from 'peerjs'
+import parameters from '../../../../../config/parameters'
 
 export default function SlavePeer(masterPeerId) {
   const message$ = new Rx.Subject()
   const eventCallbacks = {}
   let conn
 
-  const peer = new Peer({ key })
+  const peer = new Peer({ key: parameters.peerjs.key })
     .on('open', function() {
       console.info('Slave: Connected. Attempting to connect to master.')
 
       conn = peer.connect(masterPeerId)
         .on('data', function(data) {
           console.info('Slave: Message received from '+conn.peer)
+          // The message is in an object to match the same architecture of
+          // message as the MasterPeer
           message$.onNext({ message: data })
         })
         .on('open', function() {
@@ -48,10 +50,6 @@ export default function SlavePeer(masterPeerId) {
       console.error('Slave: Error', err)
     })
 
-  function send(data) {
-    conn.send(data)
-  }
-
   return {
     id() {
       return peer.id
@@ -68,7 +66,9 @@ export default function SlavePeer(masterPeerId) {
 
       return this
     },
-    send,
+    send(data) {
+      conn.send(data)
+    },
     close() {
       peer.destroy()
     }

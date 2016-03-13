@@ -4,5 +4,5 @@ testdist
 node_modules
 .remote-sync.json
 .sass-cache
-npm-debug.log
+npm-debug.log*
 ignore

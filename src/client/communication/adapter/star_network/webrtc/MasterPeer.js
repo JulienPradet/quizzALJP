@@ -1,12 +1,12 @@
 import Rx from 'rx'
-import { key } from './Peer'
 import Peer from 'peerjs'
+import parameters from '../../../../../config/parameters'
 
 export default function MasterPeer() {
   const message$ = new Rx.Subject()
   const eventCallbacks = {}
 
-  const peer = new Peer({ key })
+  const peer = new Peer({ key: parameters.peerjs.key })
     .on('open', function(id) {
       console.info('Master: Connected '+id)
       if(typeof eventCallbacks['connected'] === 'function') {
