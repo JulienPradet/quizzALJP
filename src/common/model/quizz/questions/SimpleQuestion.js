@@ -99,6 +99,23 @@ export default function SimpleQuestion(options) {
 
     toString() {
       return `SimpleQuestion(${this.key()} / ${this.title()})`
+    },
+
+    toObject() {
+      return {
+        key: this.key(),
+        title: this.title(),
+        answer: this.answer(),
+        type: 'simpleQuestion'
+      }
     }
   }
+}
+
+SimpleQuestion.fromObject = function fromObject(object) {
+    return SimpleQuestion({
+      key: object.key,
+      title: object.title,
+      answer: object.answer
+    })
 }

@@ -63,13 +63,8 @@ function requestUsers(master) {
 /* A peer manager open or close connections to players */
 function authenticationGuardian(master, authenticator) {
   return function authenticationGuardianAux(getState, updateState) {
-    master.message$
-      .subscribe((data) => {
-        console.log(data)
-      })
     master.message$.filter(({ type }) => type === AUTH_ACTIONS.OPEN_TO_PLAYERS)
       .subscribe(({peerId, type, data}) => {
-        console.log(peerId, type, data)
         authenticator.openToPlayers()
         master.send(peerId, AUTH_ACTIONS.OPENED_TO_PLAYERS)
       })

@@ -1,6 +1,8 @@
 import { Map, List } from 'immutable'
 import { InvalidArgumentError } from '../../util/Error/BasicErrors'
 
+import questions from './questions/questions'
+
 /**
  * Factory function for a quizz object
  *
@@ -139,6 +141,34 @@ export default function Quizz(options) {
 
     toString() {
       return `Quizz(${this.key()} / ${this.steps().count()} step(s))`
+    },
+
+    toObject() {
+      return {
+        key: this.key(),
+        name: this.name(),
+        steps: this.steps().toArray().map((step) => {
+          return step.toObject()
+        }),
+        type: 'quizz'
+      }
     }
   };
+}
+
+Quizz.fromObject = function fromObject(object) {
+  if(!object.type) {
+    return
+  }
+
+  if(object.type !== 'quizz') {
+    return questions.fromObject(object)
+  }
+
+
+  return Quizz({
+    key: object.key,
+    name: object.name,
+    steps: new List(object.steps.map((step) => Quizz.fromObject(step)))
+  })
 }

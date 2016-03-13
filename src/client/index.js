@@ -1,28 +1,34 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router, Route, IndexRoute } from 'react-router'
-import history from './util/history'
-import App from './container/App'
-import Landing from './container/Landing'
-import Manager from './container/manager/Manager'
-import Viewer from './container/viewer/Viewer'
-import Player from './container/player/Player'
-import QuizzCreator from './container/quizz/QuizzCreator'
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
 
-function initWebApp() {
-  ReactDOM.render(
-    <Router history={history}>
-      <Route path="/" component={App}>
-        <IndexRoute component={Landing} />
-        <Route path="quizz" component={QuizzCreator} />
+import rootReducer from './reducers'
 
-        <Route path="manager" component={Manager} />
-        <Route path="viewer/:masterId" component={Viewer} />
-        <Route path="player/:masterId" component={Player} />
-      </Route>
-    </Router>,
-    document.getElementById('react-container')
+import Main from './container/Main'
+
+function configureStore() {
+  const store = createStore(
+    rootReducer
   )
+
+  if(module.onReload) {
+    module.onReload(() => {
+      const nextReducer = require('./reducers');
+      store.replaceReducer(nextReducer.default || nextReducer);
+
+      return true;
+    })
+  }
+
+  return store
 }
 
-initWebApp()
+const store = configureStore()
+
+ReactDOM.render(
+  <Provider store={store}>
+    <Main />
+  </Provider>,
+  document.getElementById('react-container')
+)

@@ -1,28 +1,40 @@
 import React from 'react'
-import { Map } from 'immutable'
-import QuizzForm from './QuizzForm'
-import ImportQuizzForm from './ImportQuizzForm'
-import ExportQuizzForm from './ExportQuizzForm'
-import QuizzCreatorManager from './QuizzCreatorManager'
 
-export default class QuizzCreator extends React.Component {
-  constructor(props) {
-    super(props)
+import { connect } from 'react-redux'
+import { createQuizz } from '../../actions/quizz'
+
+import { FormGroup } from '../../components/ui/FormLayout'
+import { Button } from '../../components/ui/FormBase'
+import FormLine from '../../components/ui/form/FormLine'
+
+export default class QuizzCreator extends React.Component{
+  constructor() {
+    super()
+    this.state = { name: '' }
+    this.updateName = this.updateName.bind(this)
+    this.createQuizz = this.createQuizz.bind(this)
   }
 
-  componentWillMount() {
-    this.actions = QuizzCreatorManager(
-      () => this.state.data,
-      (data) => this.setState({ data })
-    )
+  updateName(event) {
+    this.setState({ name: event.target.value })
+  }
+
+  createQuizz(event) {
+    event.preventDefault()
+    if(this.state.name) {
+      this.props.createQuizz(this.state.name)
+      this.setState({ name: '' })
+    }
   }
 
   render() {
     return <div>
-      <QuizzForm saveQuizz={this.actions.saveQuizz} quizz={this.state.data.quizz} />
-
-      {/*<ExportQuizzForm />
-      <ImportQuizzForm />*/}
+      <form onSubmit={this.createQuizz}>
+        <FormGroup legend="Add a quizz" fieldset={true}>
+          <FormLine id={this.state.name} label="Quizz name:" value={this.state.name} onChange={this.updateName} />
+          <Button>Create Quizz</Button>
+        </FormGroup>
+      </form>
     </div>
   }
 }

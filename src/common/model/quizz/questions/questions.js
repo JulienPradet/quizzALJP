@@ -40,5 +40,11 @@ export default {
       questionFactoryList.questionType = factory;
       return factory;
     }
+  },
+
+  fromObject(object) {
+    if(object.type === 'simpleQuestion') {
+      return SimpleQuestion.fromObject(object)
+    }
   }
 }

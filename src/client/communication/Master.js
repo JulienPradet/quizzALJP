@@ -27,6 +27,8 @@ export default function Master(PeerAdapter) {
     }
   })
 
+  message$.subscribe(function(message) { console.debug("MESSAGE:", message)})
+
   const master = {
     id() {
       return peer.id()

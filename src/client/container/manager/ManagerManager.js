@@ -37,7 +37,18 @@ function launchManager(masterId) {
     connection(manager)(getState, updateState)
     authenticationGuardian(manager)(getState, updateState)
 
-    return manager
+    return {
+      togglePlayerAuthorization: () => {
+        if(manager) {
+          var state = getState()
+          if(state.has('authorizedPlayers') && state.get('authorizedPlayers')) {
+            manager.send(AUTH_ACTIONS.CLOSE_TO_PLAYERS)
+          } else {
+            manager.send(AUTH_ACTIONS.OPEN_TO_PLAYERS)
+          }
+        }
+      }
+    }
   }
 }
 
@@ -48,7 +59,6 @@ function launchManager(masterId) {
  * master has launched
  */
 export default function ManagerManager(getState, updateState) {
-  let manager
   let masterState = new Map()
   const masterState$ = new RxSubject()
 
@@ -60,23 +70,13 @@ export default function ManagerManager(getState, updateState) {
     }
   )
 
-  masterState$.subscribe(function(newState) {
-    if(newState.has('id')) {
+  const actions = {}
+  masterState$.subscribe(function(masterState) {
+    if(masterState.has('id')) {
       masterState$.dispose()
-      manager = launchManager(newState.get('id'))(getState, updateState)
+      Object.assign(actions, launchManager(masterState.get('id'))(getState, updateState))
     }
   })
 
-  return {
-    togglePlayerAuthorization: () => {
-      if(manager) {
-        var state = getState()
-        if(state.has('authorizedPlayers') && state.get('authorizedPlayers')) {
-          manager.send(AUTH_ACTIONS.CLOSE_TO_PLAYERS)
-        } else {
-          manager.send(AUTH_ACTIONS.OPEN_TO_PLAYERS)
-        }
-      }
-    }
-  }
+  return actions;
 }

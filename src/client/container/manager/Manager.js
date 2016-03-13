@@ -42,7 +42,7 @@ export default class ManagerComponent extends React.Component {
       ? "Forbid players"
       : "Authorize players"
 
-    const authorizePlayersButton = this.state.data.has('masterId') && this.state.data.get('connected')
+    const authorizePlayersButton = this.actions.togglePlayerAuthorization
       ? <Button onClick={ () => { this.actions.togglePlayerAuthorization() } }>{authorizePlayersButtonLabel}</Button>
       : null
 

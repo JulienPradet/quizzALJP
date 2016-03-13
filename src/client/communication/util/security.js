@@ -28,7 +28,6 @@ export function Authenticator() {
   return {
     authenticate(master, peerId, type, token) {
       const { isAuthenticated, newToken } = _authenticate(token, type)
-      console.log(isAuthenticated, type, authorizePlayers)
 
       if(isAuthenticated) {
         master.send(

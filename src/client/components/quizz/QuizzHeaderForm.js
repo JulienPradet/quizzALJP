@@ -7,18 +7,11 @@ export default class QuizzHeaderForm extends React.Component {
   constructor() {
     super()
     this.updateName = this.updateName.bind(this)
-    this.updateKey = this.updateKey.bind(this)
   }
 
   updateName(event) {
     this.props.onUpdate(
       this.props.quizz.setName(event.target.value)
-    )
-  }
-
-  updateKey(event) {
-    this.props.onUpdate(
-      this.props.quizz.setKey(event.target.value)
     )
   }
 
