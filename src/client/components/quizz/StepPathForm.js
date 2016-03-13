@@ -1,22 +1,16 @@
 import React from 'react'
 import StepButton from '../ui/form/Step'
 
-export default class StepPathForm extends React.Component {
-  constructor() {
-    super()
-  }
-
-  render() {
-    return <span>
-      <StepButton onClick={this.props.onSelect} active={this.props.active}>
-        {this.props.name}
+export default function StepPathForm(props) {
+  return <div style={{display: "inline-block"}}>
+    <StepButton onClick={props.onSelect} active={props.active}>
+      {props.name}
+    </StepButton>
+    { props.onDelete
+      ? <StepButton onClick={props.onDelete} active={props.active}>
+        &times;
       </StepButton>
-      { this.props.onDelete
-        ? <StepButton onClick={this.props.onDelete} active={this.props.active}>
-          &times;
-        </StepButton>
-        : null
-      }
-    </span>
-  }
+      : null
+    }
+  </div>
 }
