@@ -2,6 +2,8 @@ import React from 'react'
 import { Map } from 'immutable'
 import history from '../../util/history'
 import ManagerManager from './ManagerManager'
+import Block from '../../components/ui/Block'
+import { Button } from '../../components/ui/FormBase'
 
 /**
  * Master component that lauches the master node
@@ -33,7 +35,7 @@ export default class ManagerComponent extends React.Component {
       : <div>I'm not connected yet.</div>
 
     const viewerButton = this.state.data.has('masterId') && this.state.data.get('connected')
-      ? <button onClick={ () => { window.open(history.createHref('/viewer/'+this.state.data.get('masterId'))) } }>Open a viewer</button>
+      ? <Button onClick={ () => { window.open(history.createHref('/viewer/'+this.state.data.get('masterId'))) } }>Open a viewer</Button>
       : null
 
     const authorizePlayersButtonLabel = this.state.data.has("authorizedPlayers") && this.state.data.get("authorizedPlayers")
@@ -41,14 +43,17 @@ export default class ManagerComponent extends React.Component {
       : "Authorize players"
 
     const authorizePlayersButton = this.state.data.has('masterId') && this.state.data.get('connected')
-      ? <button onClick={ () => { this.actions.togglePlayerAuthorization() } }>{authorizePlayersButtonLabel}</button>
+      ? <Button onClick={ () => { this.actions.togglePlayerAuthorization() } }>{authorizePlayersButtonLabel}</Button>
       : null
 
     return <div>
       <h1>I'm a manager!</h1>
-      { currentId }
-      { viewerButton }
-      { authorizePlayersButton }
+
+      <Block>
+        { currentId }
+        { viewerButton }
+        { authorizePlayersButton }
+      </Block>
     </div>
   }
 }
