@@ -30,12 +30,44 @@ export default function Quizz(options) {
    */
   const steps = options.hasOwnProperty('steps') && List.isList(options.steps) ? options.steps : List()
 
+  const name = typeof options.name === 'string' ? options.name : ('Step ' + options.key)
+
   return {
     /**
      * Get the key of the quizz
      * @return string
      */
     key() { return options.key },
+
+    /**
+     * Name that should be displayed to authentify a step
+     * @return string
+     */
+    name() { return name },
+
+    /**
+     * Edit the key of the quizz
+     * @return Quizz
+     */
+    setKey(key) {
+      return Quizz({
+        key: key,
+        name: this.name(),
+        steps: this.steps()
+      })
+    },
+
+    /**
+     * Edit the name of the quizz
+     * @return Quizz
+     */
+    setName(name) {
+      return Quizz({
+        key: this.key(),
+        name: name,
+        steps: this.steps()
+      })
+    },
 
     /**
      * Get the remaining steps of the quizz
@@ -62,8 +94,18 @@ export default function Quizz(options) {
     addStep(step) {
       return Quizz({
         key: this.key(),
+        name: this.name(),
         steps: List.isList(step) ? this.steps().concat(step) : this.steps().push(step)
       })
+    },
+
+    removeStep(stepKey) {
+      const res = Quizz({
+        key: this.key(),
+        name: this.name(),
+        steps: this.steps().delete(stepKey)
+      })
+      return res;
     },
 
     /**
@@ -73,7 +115,8 @@ export default function Quizz(options) {
     setStep(newStep, stepKey) {
       return Quizz({
         key: this.key(),
-        steps: this.steps.set(stepKey, newStep)
+        name: this.name(),
+        steps: this.steps().set(stepKey, newStep)
       })
     },
 
@@ -88,9 +131,14 @@ export default function Quizz(options) {
         step: this.steps().first(),
         quizz: Quizz({
           key: this.key(),
+          name: this.name(),
           steps: this.steps().shift()
         })
       }
+    },
+
+    toString() {
+      return `Quizz(${this.key()} / ${this.steps().count()} step(s))`
     }
   };
 }

@@ -95,6 +95,10 @@ export default function SimpleQuestion(options) {
         points: answerPoint,
         isCorrect: isCorrect
       };
+    },
+
+    toString() {
+      return `SimpleQuestion(${this.key()} / ${this.title()})`
     }
   }
 }
